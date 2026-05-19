@@ -10,9 +10,10 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    // Menampilkan halaman daftar semua pengguna sistem beserta status aktivitas terakhirnya
     public function index()
     {
-        // Get all users and their latest activity from session table
+        // Mengambil semua user dan melakukan left join dengan tabel sessions untuk mendapatkan waktu aktivitas terakhir
         $users = User::select('users.*', DB::raw('MAX(sessions.last_activity) as last_activity'))
             ->leftJoin('sessions', 'users.id', '=', 'sessions.user_id')
             ->groupBy('users.id', 'users.name', 'users.email', 'users.email_verified_at', 'users.password', 'users.role', 'users.remember_token', 'users.created_at', 'users.updated_at')
@@ -21,6 +22,7 @@ class UserController extends Controller
         return view('admin.user.index', compact('users'));
     }
 
+    // Menyimpan data pengguna baru ke database
     public function store(Request $request)
     {
         $request->validate([
@@ -40,6 +42,7 @@ class UserController extends Controller
         return back()->with('success', 'User berhasil ditambahkan.');
     }
 
+    // Memperbarui data pengguna berdasarkan ID
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -64,11 +67,12 @@ class UserController extends Controller
         return back()->with('success', 'User berhasil diperbarui.');
     }
 
+    // Menghapus data pengguna dari database berdasarkan ID
     public function destroy($id)
     {
         $user = User::findOrFail($id);
 
-        // Prevent self-deletion
+        // Mencegah pengguna menghapus akun miliknya sendiri yang sedang aktif
         if (Auth::id() == $user->id) {
             return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }

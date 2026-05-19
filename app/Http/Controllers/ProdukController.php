@@ -15,15 +15,16 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Table;
 use PhpOffice\PhpSpreadsheet\Worksheet\Table\TableStyle;
 
-
 class ProdukController extends Controller
 {
+    // Menampilkan halaman daftar produk alternatif beserta data legalitasnya
     public function index()
     {
         $produk = Alternatif::with('legalitas')->get();
         return view('admin.produk', compact('produk'));
     }
 
+    // Menyimpan data produk alternatif baru ke database beserta foto produk
     public function store(Request $request)
     {
         $request->validate([
@@ -37,7 +38,7 @@ class ProdukController extends Controller
         DB::beginTransaction();
         try {
             $data = $request->except('foto_produk');
-            $data['is_aktif'] = false; // Default: Legalitas belum diisi
+            $data['is_aktif'] = false;
             
             if ($request->hasFile('foto_produk')) {
                 $file = $request->file('foto_produk');
@@ -48,7 +49,6 @@ class ProdukController extends Controller
 
             $produk = Alternatif::create($data);
 
-            // Create default legalitas record
             AlternatifLegalitas::create([
                 'id_alternatif' => $produk->id_alternatif,
                 'is_nib' => false,
@@ -66,6 +66,7 @@ class ProdukController extends Controller
         }
     }
 
+    // Memperbarui data detail produk alternatif berdasarkan ID
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -78,7 +79,6 @@ class ProdukController extends Controller
         $data = $request->except('foto_produk');
 
         if ($request->hasFile('foto_produk')) {
-            // Delete old photo if exists
             if ($produk->foto_produk) {
                 Storage::disk('public')->delete($produk->foto_produk);
             }
@@ -90,10 +90,10 @@ class ProdukController extends Controller
         }
 
         $produk->update($data);
-
         return redirect()->back()->with('success', 'Produk berhasil diperbarui.');
     }
 
+    // Menghapus data produk alternatif dari database beserta file fotonya
     public function destroy($id)
     {
         $produk = Alternatif::findOrFail($id);
@@ -103,13 +103,13 @@ class ProdukController extends Controller
         }
 
         $produk->delete();
-
         return redirect()->route('admin.produk')->with('success', 'Produk berhasil dihapus.');
     }
 
+    // Memperbarui data dokumen legalitas produk alternatif beserta status kelolosannya
     public function updateLegalitas(Request $request, $id)
     {
-        // Auto-derive is_* from nomor fields: jika nomor diisi, otomatis tersedia
+        // Menentukan status ketersediaan dokumen secara otomatis berdasarkan keberadaan nomor dokumen
         $request->merge([
             'is_nib' => $request->no_nib ? 1 : $request->is_nib,
             'is_bpom' => $request->no_bpom ? 1 : $request->is_bpom,
@@ -142,43 +142,36 @@ class ProdukController extends Controller
         }
 
         $legalitas = \App\Models\AlternatifLegalitas::where('id_alternatif', $id)->firstOrFail();
-        
         $data = $request->except(['no_sp_pirt_1', 'no_sp_pirt_2']);
 
-        // 1. Format Sertifikat Halal: Input 17 digits -> Store IDXXXXXXXXXXXXX
+        // Format penulisan nomor Sertifikat Halal dengan menambahkan prefiks 'ID' jika diisi
         if ($request->is_sertifikat_halal && $request->no_sertifikat_halal) {
             $data['no_sertifikat_halal'] = 'ID' . $request->no_sertifikat_halal;
         }
 
-        // 2. Format SP-PIRT: Input 13 + 2 digits -> Store XXXXXXXXXXXXX-XX
+        // Format penggabungan nomor SP-PIRT dari dua bagian input menjadi format XXXXXXXXXXXXX-XX
         if ($request->is_sp_pirt && $request->no_sp_pirt_1 && $request->no_sp_pirt_2) {
             $data['no_sp_pirt'] = $request->no_sp_pirt_1 . '-' . $request->no_sp_pirt_2;
         }
 
-        // 3. BPOM: Just store the string directly
         if ($request->is_bpom && $request->no_bpom) {
             $data['no_bpom'] = $request->no_bpom;
         }
 
-        // Calculate lolos_filter
+        // Menghitung status kelolosan legalitas: Wajib memiliki NIB, Sertifikat Halal, dan salah satu dari BPOM / SP-PIRT
         $lolos = $request->is_nib && 
                  $request->is_sertifikat_halal && 
                  ($request->is_bpom || $request->is_sp_pirt);
 
         $legalitas->update(array_merge($data, ['lolos_filter' => $lolos]));
-
-        // Repurpose is_aktif: Menandakan bahwa data legalitas sudah pernah diisi/disimpan
         $legalitas->alternatif->update(['is_aktif' => true]);
 
-        // Sync status_lolos_legalitas ke semua periode yang masih 'belum'
         $this->syncLegalitasToPeriodesBeelum($id, $lolos);
 
         return redirect()->back()->with('success', 'Legalitas produk berhasil diperbarui.');
     }
 
-    /**
-     * Propagate lolos_filter ke periode_alternatif yang masih berstatus 'belum'
-     */
+    // Menyinkronkan perubahan kelolosan legalitas ke tabel periode_alternatif untuk periode berstatus 'belum' dimulai
     private function syncLegalitasToPeriodesBeelum($idAlternatif, $lolosFilter)
     {
         $periodeIds = PeriodeKurasi::where('status_kurasi', 'belum')->pluck('id_periode_kurasi');
@@ -189,11 +182,13 @@ class ProdukController extends Controller
                 ->update(['status_lolos_legalitas' => $lolosFilter]);
         }
     }
+
+    // Mengunduh berkas template Excel untuk proses import data produk dan legalitas secara massal
     public function downloadTemplate()
     {
         $spreadsheet = new Spreadsheet();
         
-        // Sheet 1: Detail Produk
+        // Mempersiapkan Sheet 1: Detail Produk
         $sheet1 = $spreadsheet->getActiveSheet();
         $sheet1->setTitle('Detail Produk');
         $sheet1->setCellValue('A1', 'Nama Produk');
@@ -202,14 +197,13 @@ class ProdukController extends Controller
         $sheet1->setCellValue('D1', 'Deskripsi Produk');
         $sheet1->setCellValue('E1', 'Foto Produk');
         
-        // Style Header Sheet 1
         $sheet1->getStyle('A1:E1')->getFont()->setBold(true);
         foreach(range('A','D') as $columnID) {
             $sheet1->getColumnDimension($columnID)->setAutoSize(true);
         }
-        $sheet1->getColumnDimension('E')->setWidth(20); // Width for photo column
+        $sheet1->getColumnDimension('E')->setWidth(20);
 
-        // Format as Table
+        // Memformat Sheet 1 sebagai tabel bergaya Medium9 agar terlihat rapi dan premium
         $table1 = new Table('A1:E101', 'TableDetailProduk');
         $tableStyle1 = new TableStyle();
         $tableStyle1->setTheme(TableStyle::TABLE_STYLE_MEDIUM9);
@@ -217,7 +211,7 @@ class ProdukController extends Controller
         $table1->setStyle($tableStyle1);
         $sheet1->addTable($table1);
 
-        // Sheet 2: Legalitas
+        // Mempersiapkan Sheet 2: Legalitas
         $sheet2 = $spreadsheet->createSheet();
         $sheet2->setTitle('Legalitas');
         $sheet2->setCellValue('A1', 'Nama Produk');
@@ -232,19 +226,18 @@ class ProdukController extends Controller
         $sheet2->setCellValue('J1', 'No Halal (17 digit)');
         $sheet2->setCellValue('K1', 'Keterangan');
 
-        // Formulasi otomatis dari sheet pertama (untuk 100 baris pertama)
+        // Menuliskan formula untuk menyalin nama produk dan brand dari Sheet 1 secara otomatis
         for ($i = 2; $i <= 101; $i++) {
             $sheet2->setCellValue("A$i", "='Detail Produk'!A$i");
             $sheet2->setCellValue("B$i", "='Detail Produk'!B$i");
         }
 
-        // Style Header Sheet 2
         $sheet2->getStyle('A1:K1')->getFont()->setBold(true);
         foreach(range('A','K') as $columnID) {
             $sheet2->getColumnDimension($columnID)->setAutoSize(true);
         }
 
-        // Format as Table
+        // Memformat Sheet 2 sebagai tabel bergaya Medium9
         $table2 = new Table('A1:K101', 'TableLegalitas');
         $tableStyle2 = new TableStyle();
         $tableStyle2->setTheme(TableStyle::TABLE_STYLE_MEDIUM9);
@@ -261,6 +254,8 @@ class ProdukController extends Controller
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ]);
     }
+
+    // Mengimpor data produk beserta legalitasnya dari berkas Excel yang diunggah
     public function import(Request $request)
     {
         $request->validate([
@@ -277,27 +272,26 @@ class ProdukController extends Controller
         
         DB::beginTransaction();
         try {
-            // 1. Process Sheet 1: Detail Produk
+            // Memproses Sheet 1: Detail Produk
             $sheet1 = $spreadsheet->getSheetByName('Detail Produk');
             if (!$sheet1) {
                 throw new \Exception('Sheet "Detail Produk" tidak ditemukan.');
             }
 
-            // Collect drawings (images) from Sheet 1
+            // Mengambil semua objek gambar/foto produk dari Sheet 1 (Memetakan cell koordinat ke baris)
             $drawings = $sheet1->getDrawingCollection();
             $rowImages = [];
             foreach ($drawings as $drawing) {
                 $coordinate = $drawing->getCoordinates();
-                // Map images in Column E (Foto Produk) to their row number
                 if (preg_match('/^E(\d+)$/', $coordinate, $matches)) {
                     $rowImages[$matches[1]] = $drawing;
                 }
             }
 
             $rows1 = $sheet1->toArray();
-            $header1 = array_shift($rows1); // Remove header
+            $header1 = array_shift($rows1);
 
-            $excelRowIndex = 2; // Data starts at row 2 in Excel
+            $excelRowIndex = 2;
             foreach ($rows1 as $row) {
                 if (empty($row[0]) || empty($row[1])) {
                     $excelRowIndex++;
@@ -318,12 +312,13 @@ class ProdukController extends Controller
                     'deskripsi_produk' => $deskripsi,
                 ];
 
-                // Handle Image from Excel
+                // Memproses ekstraksi file gambar produk dari cell Excel jika ada
                 if (isset($rowImages[$excelRowIndex])) {
                     $drawing = $rowImages[$excelRowIndex];
                     $imageContents = '';
                     $extension = '';
 
+                    // Ekstraksi gambar tipe MemoryDrawing
                     if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\MemoryDrawing) {
                         ob_start();
                         call_user_func($drawing->getRenderingFunction(), $drawing->getImageResource());
@@ -331,6 +326,7 @@ class ProdukController extends Controller
                         ob_end_clean();
                         $extension = 'png';
                     } else {
+                        // Ekstraksi gambar tipe file biasa di dalam struktur zip xlsx
                         $zipReader = fopen($drawing->getPath(), 'r');
                         while (!feof($zipReader)) {
                             $imageContents .= fread($zipReader, 1024);
@@ -343,7 +339,6 @@ class ProdukController extends Controller
                         $filename = 'import_' . time() . '_' . uniqid() . '.' . $extension;
                         $path = 'produk/' . $filename;
                         
-                        // Delete old photo if exists
                         if ($produk && $produk->foto_produk) {
                             Storage::disk('public')->delete($produk->foto_produk);
                         }
@@ -362,7 +357,6 @@ class ProdukController extends Controller
                     $produk->update($updateData);
                 }
 
-                // Ensure legalitas record exists
                 if (!$produk->legalitas) {
                     AlternatifLegalitas::create([
                         'id_alternatif' => $produk->id_alternatif,
@@ -372,9 +366,9 @@ class ProdukController extends Controller
                 $excelRowIndex++;
             }
 
-            // 2. Process Sheet 2: Legalitas
+            // Memproses Sheet 2: Legalitas
             $sheet2 = $spreadsheet->getSheetByName('Legalitas');
-            if ($sheet1) { // We mainly need sheet 1 to have processed first
+            if ($sheet1) {
                 if ($sheet2) {
                     $rows2 = $sheet2->toArray();
                     $header2 = array_shift($rows2);
@@ -382,7 +376,7 @@ class ProdukController extends Controller
                     foreach ($rows2 as $row) {
                         if (empty($row[0]) || empty($row[1])) continue;
 
-                        // Pastikan ada data legalitas yang diisi (kolom C sampai K)
+                        // Memeriksa apakah terdapat data legalitas yang diisi di kolom C sampai K
                         $hasLegalitasData = false;
                         for ($i = 2; $i <= 10; $i++) {
                             if (isset($row[$i]) && trim($row[$i]) !== '') {
@@ -391,7 +385,6 @@ class ProdukController extends Controller
                             }
                         }
 
-                        // Jika kolom legalitas kosong semua (hanya ada nama produk karena formula), lewati
                         if (!$hasLegalitasData) continue;
 
                         $nama_produk = trim($row[0]);
@@ -427,21 +420,21 @@ class ProdukController extends Controller
                                 'keterangan' => $keterangan,
                             ];
 
-                            // BPOM Formatting (Store raw string)
+                            // Formatting BPOM
                             if ($is_bpom && $no_bpom_raw) {
                                 $updateData['no_bpom'] = $no_bpom_raw;
                             } else {
                                 $updateData['no_bpom'] = null;
                             }
 
-                            // Halal Formatting
+                            // Formatting Halal (menambahkan prefiks ID)
                             if ($is_halal && $no_halal_raw) {
                                 $updateData['no_sertifikat_halal'] = 'ID' . $no_halal_raw;
                             } else {
                                 $updateData['no_sertifikat_halal'] = $no_halal_raw ?: null;
                             }
 
-                            // PIRT Formatting (Split 15 digit to 13-2)
+                            // Formatting SP-PIRT (memisahkan digit ke format XXXXXXXXXXXXX-XX jika panjang input tepat 15 digit)
                             if ($is_pirt && strlen($no_pirt_raw) === 15) {
                                 $updateData['no_sp_pirt'] = substr($no_pirt_raw, 0, 13) . '-' . substr($no_pirt_raw, 13, 2);
                             } elseif ($is_pirt && $no_pirt_raw) {
@@ -450,7 +443,7 @@ class ProdukController extends Controller
                                 $updateData['no_sp_pirt'] = null;
                             }
 
-                            // Calculate lolos_filter
+                            // Menghitung status kelolosan legalitas otomatis
                             $lolos = $is_nib && $is_halal && ($is_bpom || $is_pirt);
                             $updateData['lolos_filter'] = $lolos;
 

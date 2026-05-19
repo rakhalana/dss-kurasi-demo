@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class PenilaianKuratorController extends Controller
 {
-    /**
-     * Menampilkan daftar periode kurasi yang ditugaskan ke kurator login
-     */
+    // Menampilkan daftar periode kurasi yang ditugaskan ke kurator yang sedang login
     public function index()
     {
         $userId = Auth::id();
@@ -24,16 +22,12 @@ class PenilaianKuratorController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Hitung progress untuk setiap periode
         foreach ($periodes as $periode) {
             $totalProdukLolos = PeriodeAlternatif::where('id_periode_kurasi', $periode->id_periode_kurasi)
                 ->where('status_lolos_legalitas', true)
                 ->count();
                 
-            // Total kriteria aktif
             $totalKriteria = Kriteria::count();
-            
-            // Berapa produk yang sudah dinilai penuh (jumlah penilaian == total kriteria)
             $produkDinilai = 0;
             
             if ($totalProdukLolos > 0 && $totalKriteria > 0) {
@@ -60,15 +54,12 @@ class PenilaianKuratorController extends Controller
         return view('kurator.penilaian.index', compact('periodes'));
     }
 
-    /**
-     * Menampilkan daftar produk dalam satu periode kurasi
-     */
+    // Menampilkan daftar produk alternatif dalam satu periode kurasi tertentu
     public function detailPeriode($id_periode)
     {
         $userId = Auth::id();
         $periode = PeriodeKurasi::findOrFail($id_periode);
         
-        // Pastikan kurator hanya mengakses periode miliknya atau yang belum di-assign
         if ($periode->id_kurator != null && $periode->id_kurator != $userId) {
             abort(403, 'Anda tidak memiliki akses ke periode kurasi ini.');
         }
@@ -80,7 +71,6 @@ class PenilaianKuratorController extends Controller
             ->orderBy('urutan_input', 'asc')
             ->get();
             
-        // Tandai status penilaian untuk masing-masing produk
         foreach ($produkList as $produk) {
             $nilaiCount = PenilaianKurasi::where('id_periode_alternatif', $produk->id_periode_alternatif)
                 ->where('dinilai_oleh', $userId)
@@ -92,9 +82,7 @@ class PenilaianKuratorController extends Controller
         return view('kurator.penilaian.detail', compact('periode', 'produkList'));
     }
 
-    /**
-     * Menampilkan antarmuka Penilaian (Workspace / Wizard)
-     */
+    // Menampilkan lembar ruang kerja (Workspace / Wizard) untuk proses input penilaian
     public function workspace($id_periode, $id_alternatif = null)
     {
         $userId = Auth::id();
@@ -104,7 +92,7 @@ class PenilaianKuratorController extends Controller
             abort(403, 'Anda tidak memiliki akses ke periode kurasi ini.');
         }
 
-        // Jika periode belum dimulai, mulai periode dan assign kurator
+        // Jika status periode kurasi belum dimulai, ubah status menjadi berlangsung dan tugaskan ke kurator login
         if ($periode->status_kurasi == 'belum') {
             $periode->update([
                 'status_kurasi' => 'berlangsung',
@@ -112,7 +100,6 @@ class PenilaianKuratorController extends Controller
             ]);
         }
 
-        // Ambil daftar produk yang LOLOS legalitas saja untuk panel navigasi (antrean)
         $antreanProduk = PeriodeAlternatif::with('alternatif')
             ->where('id_periode_kurasi', $id_periode)
             ->where('status_lolos_legalitas', true)
@@ -126,7 +113,6 @@ class PenilaianKuratorController extends Controller
 
         $totalKriteria = Kriteria::count();
 
-        // Hitung status penilaian untuk panel navigasi
         foreach ($antreanProduk as $p) {
             $nilaiCount = PenilaianKurasi::where('id_periode_alternatif', $p->id_periode_alternatif)
                 ->where('dinilai_oleh', $userId)
@@ -134,25 +120,21 @@ class PenilaianKuratorController extends Controller
             $p->is_dinilai = ($totalKriteria > 0 && $nilaiCount >= $totalKriteria);
         }
 
-        // Tentukan produk aktif yang akan dinilai
+        // Menentukan produk aktif yang sedang atau akan dinilai oleh kurator
         $produkAktif = null;
         if ($id_alternatif) {
             $produkAktif = $antreanProduk->firstWhere('id_alternatif', $id_alternatif);
             if (!$produkAktif) {
-                // Jika tidak ditemukan atau tidak lolos legalitas
                 abort(404, 'Produk tidak ditemukan atau tidak eligible untuk dinilai.');
             }
         } else {
-            // Cari produk pertama yang belum dinilai
+            // Cari produk pertama dalam antrean yang belum dinilai oleh kurator
             $produkAktif = $antreanProduk->firstWhere('is_dinilai', false);
             
-            // Jika semua sudah dinilai, tampilkan state "selesai"
             if (!$produkAktif) {
                 $semuaDinilai = true;
                 $produkAktif = $antreanProduk->first();
-                // Tidak redirect, langsung render workspace dengan flag semuaDinilai
             } else {
-                // Redirect ke URL dengan ID agar rapi
                 return redirect()->route('kurator.penilaian.workspace', [
                     'id_periode' => $id_periode, 
                     'id_alternatif' => $produkAktif->id_alternatif
@@ -160,15 +142,12 @@ class PenilaianKuratorController extends Controller
             }
         }
 
-        // Ambil data kriteria beserta skalanya
-        // Cek apakah semua produk sudah dinilai
         $semuaDinilai = $semuaDinilai ?? ($antreanProduk->every(fn($item) => $item->is_dinilai));
 
         $kriteriaList = Kriteria::with(['scales' => function($q) {
             $q->where('is_aktif', true)->orderBy('nilai_skala', 'desc');
         }])->orderBy('urutan_tampil', 'asc')->get();
 
-        // Ambil nilai yang sudah pernah diinput oleh kurator untuk produk aktif
         $penilaianExisting = PenilaianKurasi::where('id_periode_alternatif', $produkAktif->id_periode_alternatif)
             ->where('dinilai_oleh', $userId)
             ->get()
@@ -184,9 +163,7 @@ class PenilaianKuratorController extends Controller
         ));
     }
 
-    /**
-     * Menyimpan nilai untuk satu kriteria tertentu (AJAX)
-     */
+    // Menyimpan atau memperbarui nilai untuk satu kriteria tertentu (secara asinkron / AJAX)
     public function storePenilaian(Request $request, $id_periode, $id_alternatif, $id_kriteria)
     {
         $request->validate([
@@ -195,18 +172,16 @@ class PenilaianKuratorController extends Controller
 
         $userId = Auth::id();
         
-        // Cari id_periode_alternatif
         $periodeAlternatif = PeriodeAlternatif::where('id_periode_kurasi', $id_periode)
             ->where('id_alternatif', $id_alternatif)
             ->firstOrFail();
 
-        // Assign kurator ke periode jika sebelumnya null
+        // Menugaskan kurator ke periode kurasi secara otomatis jika sebelumnya belum di-assign
         $periode = PeriodeKurasi::find($id_periode);
         if ($periode && $periode->id_kurator == null) {
             $periode->update(['id_kurator' => $userId]);
         }
 
-        // Simpan atau update
         $penilaian = PenilaianKurasi::updateOrCreate(
             [
                 'id_periode_alternatif' => $periodeAlternatif->id_periode_alternatif,
@@ -225,20 +200,16 @@ class PenilaianKuratorController extends Controller
         ]);
     }
 
-    /**
-     * Menyelesaikan kurasi: update status periode menjadi 'selesai'
-     */
+    // Mengubah status periode kurasi menjadi selesai
     public function selesaikanKurasi($id_periode)
     {
         $userId = Auth::id();
         $periode = PeriodeKurasi::findOrFail($id_periode);
 
-        // Pastikan akses
         if ($periode->id_kurator != null && $periode->id_kurator != $userId) {
             abort(403, 'Anda tidak memiliki akses ke periode kurasi ini.');
         }
 
-        // Update status
         $periode->update([
             'status_kurasi' => 'selesai',
         ]);
@@ -246,9 +217,7 @@ class PenilaianKuratorController extends Controller
         return redirect()->route('kurator.penilaian.selesai', $id_periode);
     }
 
-    /**
-     * Halaman informasi bahwa kurasi telah selesai
-     */
+    // Menampilkan halaman sukses / rangkuman ketika kurasi telah selesai disubmit
     public function halamanSelesai($id_periode)
     {
         $userId = Auth::id();
@@ -258,7 +227,6 @@ class PenilaianKuratorController extends Controller
             abort(403, 'Anda tidak memiliki akses ke periode kurasi ini.');
         }
 
-        // Hitung statistik
         $totalProduk = PeriodeAlternatif::where('id_periode_kurasi', $id_periode)
             ->where('status_lolos_legalitas', true)
             ->count();

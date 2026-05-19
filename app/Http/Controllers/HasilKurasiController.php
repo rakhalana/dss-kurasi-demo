@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class HasilKurasiController extends Controller
 {
-    /**
-     * Tampilkan daftar periode kurasi yang sudah selesai.
-     */
+    // Menampilkan daftar periode kurasi yang sudah selesai
     public function index()
     {
         $user = Auth::user();
@@ -22,7 +20,7 @@ class HasilKurasiController extends Controller
             ->where('status_kurasi', 'selesai')
             ->orderBy('tanggal_kurasi', 'desc');
 
-        // Kurator hanya bisa melihat hasil kurasi yang ia tangani
+        // Kurator hanya diperbolehkan melihat hasil kurasi yang ditugaskan kepadanya
         if ($user->role === 'kurator') {
             $query->where('id_kurator', $user->id);
         }
@@ -32,9 +30,7 @@ class HasilKurasiController extends Controller
         return view('admin.hasil.index', compact('periodes'));
     }
 
-    /**
-     * Tampilkan detail hasil kurasi (Leaderboard) untuk periode tertentu.
-     */
+    // Menampilkan detail hasil kurasi (Leaderboard/peringkat) untuk periode tertentu
     public function detail($id)
     {
         $data = $this->prepareDetailData($id);
@@ -46,9 +42,7 @@ class HasilKurasiController extends Controller
         return view('admin.hasil.detail', $data);
     }
 
-    /**
-     * Cetak Laporan Hasil Kurasi.
-     */
+    // Mencetak laporan hasil kurasi untuk periode tertentu
     public function cetak($id)
     {
         $data = $this->prepareDetailData($id);
@@ -60,16 +54,15 @@ class HasilKurasiController extends Controller
         return view('admin.hasil.cetak', $data);
     }
 
-    /**
-     * Persiapkan data untuk detail dan cetak.
-     */
+    // Mempersiapkan data hasil kurasi, menghitung skor Profile Matching dan AHP untuk detail dan cetak
     private function prepareDetailData($id)
     {
         $user = Auth::user();
+        
         $periode = PeriodeKurasi::with(['kurator', 'ahpSesi.bobot.kriteria', 'periodeAlternatif.alternatif.legalitas'])
             ->findOrFail($id);
 
-        // Security check for Kurator
+        // Validasi keamanan: Pastikan kurator hanya mengakses periode miliknya sendiri
         if ($user->role === 'kurator' && $periode->id_kurator !== $user->id) {
             abort(403, 'Anda tidak memiliki akses ke hasil kurasi ini.');
         }
@@ -78,15 +71,13 @@ class HasilKurasiController extends Controller
             return redirect()->route('hasil.index')->with('error', 'Hasil kurasi hanya dapat dilihat untuk periode yang sudah selesai.');
         }
 
-        // 1. Ambil Bobot AHP untuk periode ini
         $bobots = AhpBobot::where('id_ahp_sesi', $periode->id_ahp_sesi)
             ->pluck('bobot_prioritas', 'id_kriteria');
 
-        // 2. Ambil semua kriteria beserta skala untuk deskripsi target
         $kriterias = Kriteria::with('scales')->orderBy('urutan_tampil')->get();
 
-        // 3. Hitung Skor untuk setiap alternatif dalam periode
         $results = [];
+        
         foreach ($periode->periodeAlternatif as $pa) {
             $totalScore = 0;
             $hasNegativeGap = false;
@@ -101,15 +92,18 @@ class HasilKurasiController extends Controller
 
                 $nilaiAktual = $penilaian ? $penilaian->nilai_input : 0;
                 $nilaiTarget = $k->target_nilai;
+                
+                // Menghitung selisih/gap (Aktual - Target)
                 $gap = $nilaiAktual - $nilaiTarget;
 
+                // Cek jika terdapat gap negatif (nilai aktual di bawah target kelulusan)
                 if ($gap < 0) {
                     $hasNegativeGap = true;
                     if ($gap < $minGap) {
                         $minGap = $gap;
                     }
 
-                    // Ambil deskripsi skala untuk target nilai
+                    // Mengambil deskripsi skala target nilai yang belum tercapai untuk laporan evaluasi
                     $targetScale = $k->scales->where('nilai_skala', $nilaiTarget)->first();
                     $targetDesc = $targetScale ? $targetScale->deskripsi_skala : 'Standar target belum tercapai';
 
@@ -122,8 +116,11 @@ class HasilKurasiController extends Controller
                     ];
                 }
 
+                // Memetakan nilai gap ke bobot nilai Profile Matching
                 $bobotGap = $this->mapGapToWeight($gap);
                 $ahpWeight = $bobots[$k->id_kriteria] ?? 0;
+                
+                // Menghitung skor kriteria (Bobot Gap PM * Bobot AHP)
                 $skorKriteria = $bobotGap * $ahpWeight;
                 $totalScore += $skorKriteria;
 
@@ -137,11 +134,11 @@ class HasilKurasiController extends Controller
                 ];
             }
 
-            // Cek Legalitas
             $legalitas = $pa->alternatif->legalitas;
             $missingDocs = [];
             $isLolosLegalitas = $legalitas ? $legalitas->lolos_filter : true;
 
+            // Jika legalitas tidak lolos, kumpulkan berkas yang kurang dan set skor 0 (gugur)
             if ($legalitas && !$legalitas->lolos_filter) {
                 if (!$legalitas->is_nib)
                     $missingDocs[] = 'NIB';
@@ -150,10 +147,11 @@ class HasilKurasiController extends Controller
                 }
                 if (!$legalitas->is_sertifikat_halal)
                     $missingDocs[] = 'Sertifikat Halal';
+                
                 $totalScore = 0;
             }
 
-            // Tentukan Status Lolos
+            // Menentukan status kelulusan kurasi berdasarkan kriteria kelolosan dan gap
             if (!$isLolosLegalitas) {
                 $statusLolos = 'tidak_lolos';
             } elseif (!$hasNegativeGap) {
@@ -177,7 +175,7 @@ class HasilKurasiController extends Controller
             ];
         }
 
-        // 4. Urutkan berdasarkan skor tertinggi (Ranking)
+        // Mengurutkan produk alternatif berdasarkan skor akhir tertinggi (perankingan)
         usort($results, function ($a, $b) {
             if ($a->total_score == $b->total_score)
                 return 0;
@@ -187,11 +185,10 @@ class HasilKurasiController extends Controller
         return compact('periode', 'kriterias', 'results', 'bobots');
     }
 
-    /**
-     * Map Gap value to Profile Matching weight.
-     */
+    // Memetakan nilai selisih/gap menjadi bobot nilai standar Profile Matching
     private function mapGapToWeight($gap)
     {
+        // Aturan pemetaan nilai gap ke bobot standar Profile Matching
         $map = [
             '0' => 5,
             '1' => 4.5,

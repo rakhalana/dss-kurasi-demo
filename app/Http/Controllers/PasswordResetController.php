@@ -11,23 +11,17 @@ use Illuminate\Auth\Events\PasswordReset;
 
 class PasswordResetController extends Controller
 {
-    /**
-     * Display the form to request a password reset link.
-     */
+    // Menampilkan formulir untuk meminta tautan reset kata sandi
     public function showLinkRequestForm()
     {
         return view('auth.forgot-password');
     }
 
-    /**
-     * Send a reset link to the given user.
-     */
+    // Mengirimkan tautan reset kata sandi ke email pengguna
     public function sendResetLinkEmail(Request $request)
     {
         $request->validate(['email' => 'required|email']);
 
-        // We will send the password reset link to this user. Once it has been sent
-        // we will examine the response then see the message we need to show to the user.
         $status = Password::sendResetLink(
             $request->only('email')
         );
@@ -37,11 +31,7 @@ class PasswordResetController extends Controller
             : back()->withErrors(['email' => __($status)]);
     }
 
-    /**
-     * Display the password reset view for the given token.
-     *
-     * If no token is present, display the link request form.
-     */
+    // Menampilkan halaman formulir reset kata sandi berdasarkan token yang valid
     public function showResetForm(Request $request, $token = null)
     {
         return view('auth.reset-password')->with(
@@ -49,9 +39,7 @@ class PasswordResetController extends Controller
         );
     }
 
-    /**
-     * Reset the given user's password.
-     */
+    // Melakukan proses reset kata sandi pengguna
     public function reset(Request $request)
     {
         $request->validate([
@@ -60,12 +48,10 @@ class PasswordResetController extends Controller
             'password' => 'required|confirmed|min:8',
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
+                // Melakukan update password yang di-hash dan mereset token remember
                 $user->forceFill([
                     'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
@@ -75,9 +61,6 @@ class PasswordResetController extends Controller
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the login view with a success message. Otherwise we will redirect back
-        // to the current form with an error message that includes why the reset failed.
         return $status === Password::PASSWORD_RESET
             ? redirect()->route('login')->with('status', __($status))
             : back()->withErrors(['email' => [__($status)]]);

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class PeriodeKurasiController extends Controller
 {
+    // Menampilkan daftar periode kurasi di dashboard admin
     public function index()
     {
         $periode = PeriodeKurasi::with(['kurator', 'ahpSesi'])->withCount('periodeAlternatif')->latest()->get();
@@ -21,6 +22,7 @@ class PeriodeKurasiController extends Controller
         return view('admin.kurasi.index', compact('periode', 'kurators', 'activeAHP'));
     }
 
+    // Menyimpan data periode kurasi baru ke database
     public function store(Request $request)
     {
         $request->validate([
@@ -31,6 +33,7 @@ class PeriodeKurasiController extends Controller
             'catatan_umum' => 'nullable|string',
         ]);
 
+        // Memastikan ada sesi AHP yang aktif sebelum membuat periode kurasi baru
         $activeAHP = AhpSesi::where('status_aktif', true)->first();
         if (!$activeAHP) {
             return redirect()->back()->with('error', 'Gagal membuat periode: Tidak ada Sesi AHP yang aktif saat ini.');
@@ -53,6 +56,7 @@ class PeriodeKurasiController extends Controller
         return redirect()->route('admin.kurasi.index')->with('success', 'Periode Kurasi berhasil ditambahkan.');
     }
 
+    // Memperbarui data periode kurasi tertentu berdasarkan ID
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -65,10 +69,9 @@ class PeriodeKurasiController extends Controller
         ]);
 
         $tanggal = \Carbon\Carbon::parse($request->tanggal_kurasi);
-
         $periode = PeriodeKurasi::findOrFail($id);
 
-        // Guard: hanya bisa mengedit saat status 'belum'
+        // Validasi keamanan: hanya memperbolehkan edit jika status kurasi masih 'belum' dimulai
         if ($periode->status_kurasi !== 'belum') {
             return redirect()->back()->with('error', 'Periode tidak dapat diedit karena sudah berstatus "' . ucfirst($periode->status_kurasi) . '".');
         }
@@ -87,10 +90,12 @@ class PeriodeKurasiController extends Controller
         return redirect()->route('admin.kurasi.index')->with('success', 'Periode Kurasi berhasil diperbarui.');
     }
 
+    // Menghapus data periode kurasi berdasarkan ID
     public function destroy($id)
     {
         $periode = PeriodeKurasi::findOrFail($id);
         
+        // Memastikan hanya periode dengan status 'belum' yang boleh dihapus
         if ($periode->status_kurasi !== 'belum') {
             return redirect()->back()->with('error', 'Hanya periode dengan status "Belum" yang dapat dihapus.');
         }
@@ -100,11 +105,10 @@ class PeriodeKurasiController extends Controller
         return redirect()->route('admin.kurasi.index')->with('success', 'Periode Kurasi berhasil dihapus.');
     }
 
+    // Mengelola produk alternatif yang diikutsertakan dalam periode kurasi tertentu
     public function manageProduk($id)
     {
         $periode = PeriodeKurasi::findOrFail($id);
-        
-        // Get all alternatifs, we'll indicate in the view which ones are already selected
         $alternatifs = Alternatif::all();
         $selectedAlternatifIds = PeriodeAlternatif::where('id_periode_kurasi', $id)
                                     ->pluck('id_alternatif')
@@ -113,11 +117,12 @@ class PeriodeKurasiController extends Controller
         return view('admin.kurasi.produk', compact('periode', 'alternatifs', 'selectedAlternatifIds'));
     }
 
+    // Menyimpan produk alternatif terpilih untuk masuk ke periode kurasi (menggunakan transaksi database)
     public function storeProduk(Request $request, $id)
     {
         $periode = PeriodeKurasi::findOrFail($id);
         
-        // Guard: hanya bisa mengubah produk saat status 'belum'
+        // Memastikan hanya periode dengan status 'belum' yang produknya boleh diubah
         if ($periode->status_kurasi !== 'belum') {
             return redirect()->back()->with('error', 'Produk tidak dapat diubah karena periode sudah berstatus "' . ucfirst($periode->status_kurasi) . '".');
         }
@@ -129,22 +134,22 @@ class PeriodeKurasiController extends Controller
 
         $selectedIds = $request->alternatif_ids ?? [];
 
+        // Melakukan sinkronisasi produk terpilih dalam transaksi database
         DB::transaction(function () use ($periode, $selectedIds) {
-            // Delete those not in selectedIds
+            // Menghapus produk alternatif yang sudah tidak terpilih lagi
             PeriodeAlternatif::where('id_periode_kurasi', $periode->id_periode_kurasi)
                 ->whereNotIn('id_alternatif', $selectedIds)
                 ->delete();
 
-            // Get existing ids to avoid duplicates
             $existingIds = PeriodeAlternatif::where('id_periode_kurasi', $periode->id_periode_kurasi)
                 ->pluck('id_alternatif')
                 ->toArray();
 
             $newIds = array_diff($selectedIds, $existingIds);
 
-            // Insert new selections
             $dataToInsert = [];
             foreach ($newIds as $alternatifId) {
+                // Memeriksa status kelayakan legalitas dari produk bersangkutan
                 $legalitas = \App\Models\AlternatifLegalitas::where('id_alternatif', $alternatifId)->first();
                 
                 $dataToInsert[] = [
