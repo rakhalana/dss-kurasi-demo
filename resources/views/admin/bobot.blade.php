@@ -145,28 +145,28 @@
                                                                                 class="ahp-radio-group d-flex align-items-center bg-light rounded-pill px-3 py-2 border">
                                                                                 <!-- K1 lebih dominan -->
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Mutlak lebih penting {{ $pair['k1']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k1']->nama_kriteria }} Mutlak lebih penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="9" {{ $pair['value'] == '9' ? 'checked' : '' }}>
                                                                                     <div class="ahp-radio-btn ahp-btn-left">9</div>
                                                                                 </label>
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Sangat penting {{ $pair['k1']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k1']->nama_kriteria }} Sangat penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="7" {{ $pair['value'] == '7' ? 'checked' : '' }}>
                                                                                     <div class="ahp-radio-btn ahp-btn-left">7</div>
                                                                                 </label>
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Lebih penting {{ $pair['k1']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k1']->nama_kriteria }} Lebih penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="5" {{ $pair['value'] == '5' ? 'checked' : '' }}>
                                                                                     <div class="ahp-radio-btn ahp-btn-left">5</div>
                                                                                 </label>
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Sedikit lebih penting {{ $pair['k1']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k1']->nama_kriteria }} Sedikit lebih penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="3" {{ $pair['value'] == '3' ? 'checked' : '' }}>
@@ -174,7 +174,7 @@
                                                                                 </label>
 
                                                                                 <!-- Sama Penting -->
-                                                                                <label class="m-0 mx-2" title="Sama penting">
+                                                                                <label class="m-0 mx-2" title="Kedua kriteria Sama penting">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="1" {{ $pair['value'] == '1' ? 'checked' : '' }}>
@@ -184,28 +184,28 @@
 
                                                                                 <!-- K2 lebih dominan -->
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Sedikit lebih penting {{ $pair['k2']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k2']->nama_kriteria }} Sedikit lebih penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="1/3" {{ $pair['value'] == '1/3' ? 'checked' : '' }}>
                                                                                     <div class="ahp-radio-btn ahp-btn-right">3</div>
                                                                                 </label>
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Lebih penting {{ $pair['k2']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k2']->nama_kriteria }} Lebih penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="1/5" {{ $pair['value'] == '1/5' ? 'checked' : '' }}>
                                                                                     <div class="ahp-radio-btn ahp-btn-right">5</div>
                                                                                 </label>
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Sangat penting {{ $pair['k2']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k2']->nama_kriteria }} Sangat penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="1/7" {{ $pair['value'] == '1/7' ? 'checked' : '' }}>
                                                                                     <div class="ahp-radio-btn ahp-btn-right">7</div>
                                                                                 </label>
                                                                                 <label class="m-0 mx-1"
-                                                                                    title="Mutlak lebih penting {{ $pair['k2']->nama_kriteria }}">
+                                                                                    title="{{ $pair['k2']->nama_kriteria }} Mutlak lebih penting ">
                                                                                     <input type="radio" class="d-none"
                                                                                         name="pair[{{ $pair['k1']->id_kriteria }}][{{ $pair['k2']->id_kriteria }}]"
                                                                                         value="1/9" {{ $pair['value'] == '1/9' ? 'checked' : '' }}>

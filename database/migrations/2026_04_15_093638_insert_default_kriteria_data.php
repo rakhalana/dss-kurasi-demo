@@ -15,7 +15,7 @@ return new class extends Migration {
                 'nama_kriteria' => 'Rasa',
                 'aspek' => 'kualitas_produk',
                 'deskripsi_kriteria' => 'Penilaian terhadap cita rasa produk, yang menjadi salah satu faktor utama penentu kualitas.',
-                'target_nilai' => 5,
+                'target_nilai' => 4,
                 'urutan_tampil' => 1,
             ],
             [
@@ -60,7 +60,7 @@ return new class extends Migration {
                 'nama_kriteria' => 'Uji nutrisi',
                 'aspek' => 'kualitas_produk',
                 'deskripsi_kriteria' => 'Hasil dari pengujian nutrisi yang menampilkan kandungan gizi dan jaminan standar kualitas dari produk.',
-                'target_nilai' => 4,
+                'target_nilai' => 5,
                 'urutan_tampil' => 6,
             ],
             [
@@ -78,7 +78,7 @@ return new class extends Migration {
                 'nama_kriteria' => 'Desain',
                 'aspek' => 'kemasan',
                 'deskripsi_kriteria' => 'Estetika dan daya tarik visual dari Kemasan yang dapat menarik minat pembeli.',
-                'target_nilai' => 5,
+                'target_nilai' => 4,
                 'urutan_tampil' => 8,
             ],
             [
