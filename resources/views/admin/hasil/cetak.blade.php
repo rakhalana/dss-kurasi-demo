@@ -63,10 +63,10 @@
         <thead>
             <tr>
                 <th style="width: 5%; text-align: center;">No</th>
-                <th style="width: 25%;">Nama Produk & Brand/UMKM</th>
+                <th style="width: 30%;">Nama Produk & Brand/UMKM</th>
                 <th style="width: 20%;">Nama Pemilik</th>
                 <th style="width: 15%; text-align: center;">Skor Akhir</th>
-                <th style="width: 35%;">Keterangan</th>
+                <th style="width: 30%;">Keterangan</th>
             </tr>
         </thead>
         <tbody>
@@ -77,12 +77,13 @@
                         <td class="text-center">{{ $noLolos++ }}</td>
                         <td>
                             <strong>{{ $res->alternatif->nama_produk }}</strong><br>
-                            <small class="text-muted">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
+                            <small class="text-muted d-block mb-1">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
+                            <span class="badge-monochrome badge-lolos">✓ LAYAK RETAIL</span>
                         </td>
                         <td>{{ $res->alternatif->nama_pemilik }}</td>
-                        <td class="text-center font-weight-bold text-success">{{ number_format($res->total_score, 3) }}</td>
+                        <td class="text-center font-weight-bold">{{ number_format($res->total_score, 3) }}</td>
                         <td>
-                            <span class="text-success font-weight-bold" style="font-size: 0.85rem;">Memenuhi Standar</span>
+                            <span class="font-weight-bold text-dark" style="font-size: 0.85rem;">Memenuhi Standar Kelayakan Retail</span>
                         </td>
                     </tr>
                 @endif
@@ -102,10 +103,10 @@
         <thead>
             <tr>
                 <th style="width: 5%; text-align: center;">No</th>
-                <th style="width: 25%;">Nama Produk & Brand/UMKM</th>
+                <th style="width: 30%;">Nama Produk & Brand/UMKM</th>
                 <th style="width: 20%;">Nama Pemilik</th>
                 <th style="width: 15%; text-align: center;">Skor Akhir</th>
-                <th style="width: 35%;">Catatan Perbaikan</th>
+                <th style="width: 30%;">Catatan Perbaikan</th>
             </tr>
         </thead>
         <tbody>
@@ -116,22 +117,23 @@
                         <td class="text-center">{{ $noLolosBersyarat++ }}</td>
                         <td>
                             <strong>{{ $res->alternatif->nama_produk }}</strong><br>
-                            <small class="text-muted">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
+                            <small class="text-muted d-block mb-1">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
+                            <span class="badge-monochrome badge-bersyarat">LAYAK BERSYARAT</span>
                         </td>
                         <td>{{ $res->alternatif->nama_pemilik }}</td>
-                        <td class="text-center font-weight-bold text-warning">{{ number_format($res->total_score, 3) }}</td>
+                        <td class="text-center font-weight-bold">{{ number_format($res->total_score, 3) }}</td>
                         <td>
                             <div class="eval-note text-justify">
-                                <div class="font-weight-bold text-dark mb-2" style="font-size: 0.9rem;">Aspek yang Perlu Disesuaikan:</div>
-                                <div class="pl-2 mb-2">
+                                <div class="font-weight-bold text-dark mb-2" style="font-size: 0.85rem; text-decoration: underline;">Daftar Perbaikan (To-Do):</div>
+                                <div class="mb-2">
                                     @foreach($res->evaluations as $eval)
-                                        <div class="eval-item text-dark mb-1" style="font-size: 0.85rem; line-height: 1.4;">
-                                            <span class="text-warning mr-1">●</span> <strong>{{ $eval['kriteria'] }}</strong> (Target: {{ $eval['target_desc'] }})
+                                        <div class="eval-item text-dark mb-1" style="font-size: 0.82rem; line-height: 1.4;">
+                                            <span class="todo-box">[ ]</span> <strong>{{ $eval['kriteria'] }}</strong> (Target: {{ $eval['target_desc'] }})
                                         </div>
                                     @endforeach
                                 </div>
                                 <div class="print-recommendation-box warn">
-                                    <div class="rec-title text-warning">Rekomendasi Tindak Lanjut:</div>
+                                    <div class="rec-title text-dark">Rekomendasi Tindak Lanjut:</div>
                                     <div class="rec-text text-dark">Lakukan penyesuaian pada aspek di atas agar memenuhi standar retail sepenuhnya.</div>
                                 </div>
                             </div>
@@ -149,16 +151,15 @@
     </table>
 
     {{-- TABEL 3: PRODUK BELUM LAYAK --}}
-    <h5 class="font-weight-bold mb-3" style="text-decoration: underline;">III. Daftar Produk Belum Layak & Catatan
-        Evaluasi</h5>
+    <h5 class="font-weight-bold mb-3" style="text-decoration: underline;">III. Daftar Produk Belum Layak & Catatan Evaluasi</h5>
     <table class="table-report">
         <thead>
             <tr>
                 <th style="width: 5%; text-align: center;">No</th>
-                <th style="width: 25%;">Nama Produk & Brand/UMKM</th>
+                <th style="width: 30%;">Nama Produk & Brand/UMKM</th>
                 <th style="width: 20%;">Nama Pemilik</th>
                 <th style="width: 15%; text-align: center;">Skor Akhir</th>
-                <th style="width: 35%;">Catatan Evaluasi</th>
+                <th style="width: 30%;">Catatan Evaluasi</th>
             </tr>
         </thead>
         <tbody>
@@ -169,12 +170,13 @@
                         <td class="text-center">{{ $noTidakLolos++ }}</td>
                         <td>
                             <strong>{{ $res->alternatif->nama_produk }}</strong><br>
-                            <small class="text-muted">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
+                            <small class="text-muted d-block mb-1">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
+                            <span class="badge-monochrome badge-tidak-lolos">BELUM LAYAK</span>
                         </td>
                         <td>{{ $res->alternatif->nama_pemilik }}</td>
-                        <td class="text-center font-weight-bold text-danger">
+                        <td class="text-center font-weight-bold">
                             @if(!$res->is_lolos_legalitas)
-                                <span style="font-size: 0.8rem;">Gagal<br>Legalitas</span>
+                                <span style="font-size: 0.8rem; font-weight: bold; text-transform: uppercase; display: block; line-height: 1.2;">Gagal<br>Legalitas</span>
                             @else
                                 {{ number_format($res->total_score, 3) }}
                             @endif
@@ -182,29 +184,29 @@
                         <td>
                             @if(!$res->is_lolos_legalitas)
                                 <div class="eval-note text-justify">
-                                    <div class="font-weight-bold text-danger mb-2" style="font-size: 0.9rem;">Dokumen Wajib Belum Lengkap:</div>
-                                    <div class="pl-2 mb-2">
-                                        <div class="eval-item text-dark mb-1" style="font-size: 0.85rem; line-height: 1.4;">
-                                            <span class="text-danger mr-1">●</span> <strong>{{ implode(', ', $res->missing_docs) }}</strong>
+                                    <div class="font-weight-bold text-dark mb-2" style="font-size: 0.85rem; text-decoration: underline;">Dokumen Wajib Belum Lengkap:</div>
+                                    <div class="mb-2">
+                                        <div class="eval-item text-dark mb-1" style="font-size: 0.82rem; line-height: 1.4;">
+                                            <span class="todo-box text-dark font-weight-bold">[✗]</span> <strong>{{ implode(', ', $res->missing_docs) }}</strong>
                                         </div>
                                     </div>
                                     <div class="print-recommendation-box danger">
-                                        <div class="rec-title text-danger">Rekomendasi Tindak Lanjut:</div>
+                                        <div class="rec-title text-dark">Rekomendasi Tindak Lanjut:</div>
                                         <div class="rec-text text-dark">Segera lengkapi dokumen legalitas yang kurang untuk mengikuti kurasi periode berikutnya.</div>
                                     </div>
                                 </div>
                             @else
                                 <div class="eval-note text-justify">
-                                    <div class="font-weight-bold text-danger mb-2" style="font-size: 0.9rem;">Aspek yang Belum Memenuhi Standar:</div>
-                                    <div class="pl-2 mb-2">
+                                    <div class="font-weight-bold text-dark mb-2" style="font-size: 0.85rem; text-decoration: underline;">Aspek yang Belum Memenuhi Standar:</div>
+                                    <div class="mb-2">
                                         @foreach($res->evaluations as $eval)
-                                            <div class="eval-item text-dark mb-1" style="font-size: 0.85rem; line-height: 1.4;">
-                                                <span class="text-danger mr-1">●</span> <strong>{{ $eval['kriteria'] }}</strong> (Target: {{ $eval['target_desc'] }})
+                                            <div class="eval-item text-dark mb-1" style="font-size: 0.82rem; line-height: 1.4;">
+                                                <span class="todo-box">[ ]</span> <strong>{{ $eval['kriteria'] }}</strong> (Target: {{ $eval['target_desc'] }})
                                             </div>
                                         @endforeach
                                     </div>
                                     <div class="print-recommendation-box danger">
-                                        <div class="rec-title text-danger">Rekomendasi Tindak Lanjut:</div>
+                                        <div class="rec-title text-dark">Rekomendasi Tindak Lanjut:</div>
                                         <div class="rec-text text-dark">Lakukan perbaikan menyeluruh pada aspek di atas agar siap diajukan kembali pada periode kurasi berikutnya.</div>
                                     </div>
                                 </div>

@@ -52,7 +52,7 @@
 
     .eval-note {
         font-size: 0.8rem;
-        color: #444;
+        color: #000;
         margin-top: 5px;
         display: block;
         line-height: 1.4;
@@ -65,6 +65,88 @@
 
     .text-justify {
         text-align: justify;
+    }
+
+    // Badge Monochrome Styles for UMKM UX
+    .badge-monochrome {
+        display: inline-block;
+        padding: 3px 6px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        border-radius: 3px;
+        text-transform: uppercase;
+        border: 1px solid #000;
+        line-height: 1.2;
+        margin-top: 4px;
+        
+        &.badge-lolos {
+            background-color: #000 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        &.badge-bersyarat {
+            background-color: #f2f2f2 !important;
+            border-style: dashed;
+            color: #000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        &.badge-tidak-lolos {
+            border: 2px solid #000;
+            background-color: #fff !important;
+            color: #000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+    // Monospace Todo Checklist Box for UMKM
+    .todo-box {
+        font-family: monospace;
+        font-weight: bold;
+        font-size: 0.9rem;
+        margin-right: 4px;
+        letter-spacing: 1px;
+    }
+}
+
+.print-recommendation-box {
+    padding: 8px 12px;
+    margin-top: 8px;
+    border-radius: 4px;
+    border: 1px solid #000;
+    border-left: 5px solid #000;
+    background-color: #f8f9fa !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 0.8rem;
+    line-height: 1.4;
+
+    &.warn {
+        border-color: #888;
+        border-left: 5px solid #555;
+        background-color: #fafafa !important;
+    }
+
+    &.danger {
+        border-color: #000;
+        border-left: 5px solid #000;
+        background-color: #f0f0f0 !important;
+    }
+    
+    .rec-title {
+        font-weight: bold;
+        font-size: 0.82rem;
+        margin-bottom: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .rec-text {
+        font-style: italic;
     }
 }
 
@@ -103,53 +185,30 @@
         }
     }
 
-    .text-success {
-        color: #28a745 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    
-    .text-warning {
-        color: #d39e00 !important;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-    }
-    
-    .text-danger {
-        color: #dc3545 !important;
+    // Keep black/dark for all statuses in print
+    .text-success, .text-warning, .text-danger {
+        color: #000 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
     .print-recommendation-box {
-        padding: 10px 14px;
-        margin-top: 10px;
-        border-radius: 6px;
-        border-left: 4px solid #6c757d;
         background-color: #f8f9fa !important;
+        border: 1px solid #000 !important;
+        border-left: 5px solid #000 !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
-        font-size: 0.85rem;
-        line-height: 1.4;
 
         &.warn {
-            border-color: #d39e00 !important;
-            background-color: #fff9e6 !important;
+            border-color: #888 !important;
+            border-left: 5px solid #555 !important;
+            background-color: #fafafa !important;
         }
 
         &.danger {
-            border-color: #dc3545 !important;
-            background-color: #fdf2f2 !important;
-        }
-        
-        .rec-title {
-            font-weight: bold;
-            font-size: 0.88rem;
-            margin-bottom: 4px;
-        }
-
-        .rec-text {
-            font-style: italic;
+            border-color: #000 !important;
+            border-left: 5px solid #000 !important;
+            background-color: #f0f0f0 !important;
         }
     }
 }
