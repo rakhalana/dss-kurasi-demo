@@ -21,8 +21,6 @@ class PeriodeKurasi extends Model
         'penanggung_jawab',
         'status_kurasi',
         'id_ahp_sesi',
-        'produk_terbaik_id',
-        'catatan_umum',
     ];
 
     protected $casts = [
@@ -41,11 +39,7 @@ class PeriodeKurasi extends Model
         return $this->belongsTo(AhpSesi::class, 'id_ahp_sesi', 'id_ahp_sesi');
     }
 
-    // Relasi ke produk alternatif terbaik hasil perhitungan keputusan periode ini
-    public function produkTerbaik(): BelongsTo
-    {
-        return $this->belongsTo(Alternatif::class, 'produk_terbaik_id', 'id_alternatif');
-    }
+
 
     // Relasi satu-ke-banyak ke daftar produk alternatif yang terdaftar di periode ini
     public function periodeAlternatif(): HasMany

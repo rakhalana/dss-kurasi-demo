@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 // Migrasi untuk membuat tabel relasi periode dan alternatif (jembatan/pivot)
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         // Membuat tabel daftar alternatif yang diikutsertakan pada setiap periode
@@ -15,7 +14,6 @@ return new class extends Migration
             $table->unsignedInteger('id_periode_kurasi'); // Periode kurasi terkait
             $table->unsignedInteger('id_alternatif'); // Alternatif produk terkait
             $table->boolean('status_lolos_legalitas')->nullable(); // Kelulusan seleksi awal berkas administrasi/legalitas
-            $table->text('keterangan_filter')->nullable(); // Alasan ketidaklolosan seleksi berkas
             $table->unsignedInteger('urutan_input')->nullable(); // Urutan produk saat kurator melakukan penilaian
             $table->dateTime('created_at')->nullable();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();

@@ -15,7 +15,6 @@ class PeriodeAlternatif extends Model
         'id_periode_kurasi',
         'id_alternatif',
         'status_lolos_legalitas',
-        'keterangan_filter',
         'urutan_input',
     ];
 
