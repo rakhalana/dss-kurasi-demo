@@ -79,10 +79,10 @@ Status: ✅ **DONE**
 - **Progress Tracker & Completion**: Pelacakan progres real-time dan alur penyelesaian tugas kurasi yang formal.
 
 ### 📊 Modul 6: Hasil, Ranking & Laporan
-Status: 🏗️ **IN PROGRESS**
+Status: ✅ **DONE**
 - **Profile Matching Engine**: Kalkulasi gap dan konversi bobot sesuai parameter yang diset admin.
 - **Leaderboard**: Tabel ranking produk berdasarkan skor final gabungan AHP-PM.
-- **Export PDF**: Generasi laporan resmi per periode (sedang dalam tahap finalisasi).
+- **Export PDF**: Generasi laporan resmi per periode.
 
 ---
 
@@ -92,7 +92,7 @@ Status: 🏗️ **IN PROGRESS**
 2. **Phase 2 (AHP)**: Implementasi Matriks Perbandingan & Uji Konsistensi. ✅
 3. **Phase 3 (Product & Legal)**: CRUD Produk & Logika Filter Legalitas Otomatis. ✅
 4. **Phase 4 (Assessment)**: Manajemen Periode & Workspace Penilaian Kurator. ✅
-5. **Phase 5 (Calculation & Reporting)**: Integrasi Profile Matching & Export PDF. 🏗️
+5. **Phase 5 (Calculation & Reporting)**: Integrasi Profile Matching & Export PDF. ✅
 
 ---
 

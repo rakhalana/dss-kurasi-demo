@@ -78,7 +78,7 @@
                         <td>
                             <strong>{{ $res->alternatif->nama_produk }}</strong><br>
                             <small class="text-muted d-block mb-1">{{ $res->alternatif->brand ?? $res->alternatif->nama_brand_umkm }}</small>
-                            <span class="badge-monochrome badge-lolos">✓ LAYAK RETAIL</span>
+                            <span class="badge-monochrome badge-lolos">LAYAK RETAIL</span>
                         </td>
                         <td>{{ $res->alternatif->nama_pemilik }}</td>
                         <td class="text-center font-weight-bold">{{ number_format($res->total_score, 3) }}</td>
