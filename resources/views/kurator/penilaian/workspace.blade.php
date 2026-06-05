@@ -262,7 +262,7 @@
                 const currentIndex = antrean.indexOf(idAlternatif);
                 if (currentIndex !== -1 && currentIndex < antrean.length - 1) {
                     const nextId = antrean[currentIndex + 1];
-                    const nextUrl = workspaceUrlTemplate.replace(':id', nextId);
+                    const nextUrl = decodeURIComponent(workspaceUrlTemplate).replace(':id', nextId);
                     window.location.href = nextUrl;
                 } else {
                     // All products assessed - go to workspace without ID to trigger semuaDinilai
@@ -329,7 +329,7 @@
                     return;
                 }
 
-                const saveUrl = saveUrlTemplate.replace(':kriteria_id', idKriteria);
+                const saveUrl = decodeURIComponent(saveUrlTemplate).replace(':kriteria_id', idKriteria);
 
                 $.ajax({
                     url: saveUrl,
