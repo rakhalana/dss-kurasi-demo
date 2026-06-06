@@ -21,7 +21,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             // Regenerasi sesi untuk mencegah session fixation
             $request->session()->regenerate();
-            
+
             // Simpan email di cookie selama 30 hari jika opsi "Ingat Saya" aktif
             if ($remember) {
                 \Illuminate\Support\Facades\Cookie::queue('remember_email', $request->email, 43200); // 30 hari
@@ -41,23 +41,23 @@ class AuthController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        
+
         if ($user->role === 'admin') {
             $totalKriteria = \App\Models\Kriteria::count();
             $totalPeriodeKurasi = \App\Models\PeriodeKurasi::count();
             $totalProduk = \App\Models\Alternatif::count();
-            
+
             // Mendapatkan sesi AHP yang saat ini berstatus aktif
             $activeSesi = \Illuminate\Support\Facades\DB::table('ahp_sesi')->where('status_aktif', true)->first();
-            
+
             // Mengambil daftar kriteria beserta bobot prioritas terbarunya dari sesi AHP aktif
             $kriteriaBobots = \Illuminate\Support\Facades\DB::table('kriteria')
-                ->leftJoin('ahp_bobot', function($join) use ($activeSesi) {
+                ->leftJoin('ahp_bobot', function ($join) use ($activeSesi) {
                     $join->on('kriteria.id_kriteria', '=', 'ahp_bobot.id_kriteria');
                     if ($activeSesi) {
                         $join->where('ahp_bobot.id_ahp_sesi', '=', $activeSesi->id_ahp_sesi);
                     } else {
-                        $join->where('ahp_bobot.id_ahp_sesi', '=', -1); 
+                        $join->where('ahp_bobot.id_ahp_sesi', '=', -1);
                     }
                 })
                 ->orderBy('kriteria.urutan_tampil')
@@ -91,39 +91,46 @@ class AuthController extends Controller
 
             // 4. Data tren 5 periode terakhir (jumlah produk layak retail per periode)
             $trendData = $scoreService->getTrendData(5);
- 
+
             return view('admin.dashboard', compact(
-                'totalKriteria', 'totalPeriodeKurasi', 'totalProduk', 'kriteriaBobots',
-                'totalLayakRetail', 'periodeSelesaiList', 'top5Produk', 'latestPeriode', 'trendData'
+                'totalKriteria',
+                'totalPeriodeKurasi',
+                'totalProduk',
+                'kriteriaBobots',
+                'totalLayakRetail',
+                'periodeSelesaiList',
+                'top5Produk',
+                'latestPeriode',
+                'trendData'
             ));
         } elseif ($user->role === 'kurator') {
             $userId = Auth::id();
-            
+
             // Mengambil tugas kurasi aktif yang ditugaskan kepada kurator login
             $recentActiveTask = \App\Models\PeriodeKurasi::where('id_kurator', $userId)
                 ->whereIn('status_kurasi', ['berlangsung', 'belum'])
                 ->orderBy('created_at', 'desc')
                 ->first();
-                 
+
             $progress = [
                 'assessed' => 0,
                 'total' => 0,
                 'percentage' => 0
             ];
-            
+
             // Jika terdapat tugas aktif, hitung progress penilaian kurasi
             if ($recentActiveTask) {
                 $totalKriteria = \App\Models\Kriteria::count();
                 $totalProdukLolos = \App\Models\PeriodeAlternatif::where('id_periode_kurasi', $recentActiveTask->id_periode_kurasi)
                     ->where('status_lolos_legalitas', true)
                     ->count();
-                
+
                 $produkDinilai = 0;
                 if ($totalProdukLolos > 0 && $totalKriteria > 0) {
                     $paIds = \App\Models\PeriodeAlternatif::where('id_periode_kurasi', $recentActiveTask->id_periode_kurasi)
                         ->where('status_lolos_legalitas', true)
                         ->pluck('id_periode_alternatif');
-                        
+
                     foreach ($paIds as $paId) {
                         // Periksa apakah kriteria yang dinilai oleh kurator untuk produk ini sudah lengkap
                         $count = \App\Models\PenilaianKurasi::where('id_periode_alternatif', $paId)
@@ -134,35 +141,39 @@ class AuthController extends Controller
                         }
                     }
                 }
-                
+
                 $progress = [
                     'assessed' => $produkDinilai,
                     'total' => $totalProdukLolos,
                     'percentage' => $totalProdukLolos > 0 ? round(($produkDinilai / $totalProdukLolos) * 100) : 0
                 ];
             }
-            
+
             $activeTasksCount = \App\Models\PeriodeKurasi::where('id_kurator', $userId)
                 ->whereIn('status_kurasi', ['berlangsung', 'belum'])
                 ->count();
-                
+
             $completedTasksCount = \App\Models\PeriodeKurasi::where('id_kurator', $userId)
                 ->where('status_kurasi', 'selesai')
                 ->count();
-                
+
+            // $totalProductsCount = \App\Models\PeriodeAlternatif::whereHas('periodeKurasi', function ($q) use ($userId) {
+            //     $q->where('id_kurator', $userId);
+            // })->count();
             $totalProductsCount = \App\Models\PenilaianKurasi::where('dinilai_oleh', $userId)
                 ->distinct('id_periode_alternatif')
                 ->count();
- 
+
+
             return view('kurator.dashboard', compact(
-                'recentActiveTask', 
-                'progress', 
-                'activeTasksCount', 
-                'completedTasksCount', 
+                'recentActiveTask',
+                'progress',
+                'activeTasksCount',
+                'completedTasksCount',
                 'totalProductsCount'
             ));
         }
- 
+
         Auth::logout();
         return redirect('/')->withErrors(['email' => 'Role pengguna tidak valid.']);
     }
