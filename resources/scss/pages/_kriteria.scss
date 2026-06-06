@@ -12,50 +12,6 @@
         font-weight: 600;
     }
 
-    .kriteria-hero {
-        overflow: hidden;
-
-        .badge-light {
-            color: #2253a6;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-    }
-
-    .hero-panel {
-        background: rgba(255, 255, 255, 0.18);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 18px;
-        padding: 20px;
-        backdrop-filter: blur(4px);
-
-        .hero-panel-label {
-            color: #fff;
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-        }
-
-        .hero-panel-item {
-            color: rgba(255, 255, 255, 0.95);
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-
-            & + .hero-panel-item {
-                margin-top: 10px;
-            }
-        }
-    }
-
-    .kpi-card .card-body {
-        min-height: 168px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-
     .table {
         thead th {
             border-top: 0;
@@ -76,202 +32,163 @@
     .font-weight-semibold {
         font-weight: 600;
     }
+}
 
-    .parameter-type {
-        color: #355070;
-        font-weight: 600;
+/* Premium Card Kriteria */
+.card-kriteria {
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-radius: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    background-color: #ffffff;
+    margin-bottom: 20px;
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.065) !important;
+        border-color: rgba(74, 144, 226, 0.3);
+    }
+}
+
+/* Kode Kriteria Badge Gradient */
+.kriteria-code-badge {
+    background: linear-gradient(135deg, #4a90e2 0%, #357ebd 100%);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(74, 144, 226, 0.3);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Aspek Chip Stylings */
+.aspek-chip {
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    letter-spacing: 0.02em;
+
+    &.aspek-kualitas-produk {
+        background: rgba(25, 135, 84, 0.08);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.15);
     }
 
-    .target-pill {
-        background: #edf4ff;
-        border-radius: 999px;
-        color: #0d4aa5;
-        display: inline-flex;
-        font-weight: 700;
-        padding: 8px 14px;
+    &.aspek-kemasan {
+        background: rgba(253, 126, 20, 0.08);
+        color: #fd7e14;
+        border: 1px solid rgba(253, 126, 20, 0.15);
+    }
+}
+
+/* Target Pill styling */
+.target-pill {
+    background: rgba(13, 202, 240, 0.08);
+    color: #0aa2c0;
+    border: 1px solid rgba(13, 202, 240, 0.15);
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    letter-spacing: 0.02em;
+}
+
+/* Status Indicator Dots */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 30px;
+    line-height: 1;
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        display: inline-block;
     }
 
-    .aspek-chip {
-        border-radius: 999px;
-        display: inline-flex;
-        font-size: 0.85rem;
-        font-weight: 600;
-        padding: 8px 12px;
+    &.status-active {
+        background: rgba(25, 135, 84, 0.08);
+        color: #198754;
+        border: 1px solid rgba(25, 135, 84, 0.15);
 
-        &.aspek-kualitas-produk {
-            background: #e8f7ef;
-            color: #1c7c54;
-        }
-
-        &.aspek-kemasan {
-            background: #fff3e8;
-            color: #c56a1b;
-        }
-    }
-
-    .parameter-summary {
-        display: grid;
-        gap: 14px;
-
-        .parameter-summary-item {
-            align-items: center;
-            background: #f8faff;
-            border: 1px solid #e9edf5;
-            border-radius: 16px;
-            display: flex;
-            gap: 14px;
-            padding: 14px 16px;
-
-            .parameter-summary-icon {
-                background: linear-gradient(135deg, #0d6efd, #3da5ff);
-                border-radius: 14px;
-                color: #fff;
-                font-size: 1.1rem;
-                height: 44px;
-                width: 44px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-            }
-        }
-    }
-
-    .target-rules {
-        display: grid;
-        gap: 14px;
-
-        .target-rule-item {
-            align-items: flex-start;
-            display: flex;
-            gap: 12px;
-
-            .rule-index {
-                background: #172554;
-                border-radius: 50%;
-                color: #fff;
-                font-size: 0.82rem;
-                font-weight: 700;
-                height: 30px;
-                width: 30px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-            }
-        }
-    }
-
-    .rubric-card {
-        background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-        border: 1px solid #e8edf5;
-        border-radius: 18px;
-        height: 100%;
-        margin-bottom: 20px;
-        padding: 20px;
-
-        .rubric-icon {
-            background: #edf4ff;
-            border-radius: 16px;
-            color: #0d6efd;
-            font-size: 1.2rem;
-            height: 52px;
-            width: 52px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            margin-bottom: 12px;
-        }
-
-        .rubric-list {
-            color: #526071;
-            padding-left: 18px;
-
-            li + li {
-                margin-top: 8px;
-            }
+        .status-dot {
+            background-color: #198754;
+            box-shadow: 0 0 8px #198754;
         }
     }
 
-    .workflow {
-        display: grid;
-        gap: 16px;
+    &.status-inactive {
+        background: rgba(108, 117, 125, 0.08);
+        color: #6c757d;
+        border: 1px solid rgba(108, 117, 125, 0.15);
 
-        .workflow-step {
-            align-items: flex-start;
-            display: flex;
-            gap: 14px;
-
-            .workflow-number {
-                background: linear-gradient(135deg, #0f172a, #334155);
-                border-radius: 14px;
-                color: #fff;
-                font-size: 0.85rem;
-                font-weight: 700;
-                height: 48px;
-                width: 48px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-            }
-        }
-    }
-
-    .note-list {
-        display: grid;
-        gap: 16px;
-
-        .note-item {
-            background: #f8fafc;
-            border: 1px solid #e9edf5;
-            border-radius: 16px;
-            padding: 14px 16px;
-            align-items: flex-start;
-            display: flex;
-            gap: 14px;
-
-            i {
-                font-size: 1.1rem;
-                margin-top: 2px;
-            }
-        }
-    }
-
-    .dataTables_wrapper {
-        .dataTables_filter input {
-            border: 1px solid #d7dfeb;
-            border-radius: 10px;
-            margin-left: 8px;
-            padding: 6px 10px;
-        }
-
-        .pagination .page-link {
-            border-radius: 10px;
-            margin: 0 3px;
-        }
-    }
-
-    // Media Queries nested
-    @media (max-width: ($big-tablet-bkp)) {
-        .hero-panel {
-            margin-top: 8px;
-        }
-
-        .kpi-card .card-body {
-            min-height: auto;
+        .status-dot {
+            background-color: #6c757d;
         }
     }
 }
 
-.card-kriteria { transition: all 0.3s ease; border-radius: 12px; }
-.card-kriteria:hover { transform: translateY(-3px); }
-.text-strikethrough { text-decoration: line-through; opacity: 0.6; }
+/* Collapse trigger rotating arrow */
+.btn-collapse-trigger {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50% !important;
+
+    &[aria-expanded="true"] {
+        transform: rotate(180deg);
+        background-color: #f1f5f9;
+    }
+}
+
+/* Scale badge in parameter table */
+.scale-badge-pill {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding: 5px 12px;
+    border-radius: 30px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.text-strikethrough {
+    text-decoration: line-through;
+    opacity: 0.65;
+}
 
 /* Text truncation for nama kriteria & aspek */
-.kriteria-info { min-width: 0; flex: 1 1 0; overflow: hidden; }
-.kriteria-text { min-width: 0; overflow: hidden; }
+.kriteria-info {
+    min-width: 0;
+    flex: 1 1 0;
+    overflow: hidden;
+}
+
+.kriteria-text {
+    min-width: 0;
+    overflow: hidden;
+}
+
 .text-truncate-custom {
     display: block;
     white-space: nowrap;
@@ -280,15 +197,3 @@
     max-width: 100%;
 }
 
-.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-/* Chevron toggle visibility */
-.btn[data-toggle="collapse"].collapsed .icon-up { display: none; }
-.btn[data-toggle="collapse"]:not(.collapsed) .icon-down { display: none; }
-
-.btn[data-toggle="collapse"] i {
-    transition: all 0.2s ease;
-}

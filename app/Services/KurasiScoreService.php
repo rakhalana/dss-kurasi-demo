@@ -39,7 +39,7 @@ class KurasiScoreService
      */
     public function calculateResults(PeriodeKurasi $periode): array
     {
-        // Pastikan relasi sudah dimuat
+        // memastikan relasi sudah dimuat
         if (!$periode->relationLoaded('periodeAlternatif')) {
             $periode->load(['periodeAlternatif.alternatif.legalitas', 'ahpSesi.bobot.kriteria']);
         }

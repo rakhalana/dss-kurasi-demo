@@ -16,7 +16,8 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h4 class="font-weight-bold text-primary mb-1">Manajemen Kriteria & Parameter</h4>
-                            <p class="text-muted small mb-0">Konfigurasi kriteria penilaian dan aktifkan/nonaktifkan skala penilaian.</p>
+                            <p class="text-muted small mb-0">Konfigurasi kriteria penilaian dan aktifkan/nonaktifkan skala
+                                penilaian.</p>
                         </div>
                     </div>
 
@@ -32,68 +33,88 @@
                     <div class="row">
                         @foreach ($kriteria as $item)
                             <div class="col-12">
-                                <div class="card border-0 shadow-sm overflow-hidden card-kriteria">
-                                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom-0">
+                                <div class="card card-kriteria border-0 shadow-sm overflow-hidden">
+                                    <div
+                                        class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center border-bottom-0">
                                         <div class="d-flex align-items-center kriteria-info mr-3">
-                                            <div class="rounded-circle bg-primary-light p-2 mr-3 text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
-                                                <span class="font-weight-bold">{{ $item->kode_kriteria }}</span>
+                                            <div class="kriteria-code-badge mr-3">
+                                                <span>{{ $item->kode_kriteria }}</span>
                                             </div>
                                             <div class="kriteria-text">
-                                                <h6 class="mb-0 font-weight-bold text-dark text-truncate-custom">{{ $item->nama_kriteria }}</h6>
-                                                <small class="text-muted text-truncate-custom">{{ ucfirst(str_replace('_', ' ', $item->aspek)) }}</small>
+                                                <h6 class="mb-1 font-weight-bold text-dark text-truncate-custom">
+                                                    {{ $item->nama_kriteria }}</h6>
+                                                <span class="aspek-chip aspek-{{ str_replace('_', '-', $item->aspek) }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $item->aspek)) }}
+                                                </span>
                                             </div>
                                         </div>
-                                        <div class="d-flex align-items-center">
-                                            <span class="badge badge-info mr-3 p-2 px-3 badge-pill">Target: {{ $item->target_nilai }}</span>
-                                            <button class="btn btn-sm btn-light rounded-circle shadow-sm collapsed" type="button" data-toggle="collapse" data-target="#collapse-{{ $item->id_kriteria }}" aria-expanded="false">
-                                                <i data-lucide="chevron-down" class="icon-down"></i>
-                                                <i data-lucide="chevron-up" class="icon-up"></i>
+                                        <div class="d-flex align-items-center mt-2 mt-sm-0">
+                                            <span class="target-pill mr-3">
+                                                Nilai Target: {{ $item->target_nilai }}
+                                            </span>
+                                            <button class="btn btn-sm btn-light btn-collapse-trigger shadow-sm collapsed mr-2"
+                                                type="button" data-toggle="collapse"
+                                                data-target="#collapse-{{ $item->id_kriteria }}" aria-expanded="false">
+                                                <i data-lucide="chevron-down" style="width: 16px; height: 16px;"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-primary ml-2 px-3 rounded-pill" data-toggle="modal" data-target="#modalEdit-{{ $item->id_kriteria }}">
-                                                <i data-lucide="pencil" class="mr-sm-1"></i><span class="d-none d-sm-inline">Edit</span>
+                                            <button class="btn btn-sm btn-outline-primary px-3 rounded-pill" data-toggle="modal"
+                                                data-target="#modalEdit-{{ $item->id_kriteria }}">
+                                                <i data-lucide="pencil" class="mr-sm-1"
+                                                    style="width: 13px; height: 13px;"></i><span
+                                                    class="d-none d-sm-inline">Edit</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="collapse" id="collapse-{{ $item->id_kriteria }}">
                                         <div class="card-body pt-0">
-                                            <p class="text-muted small mt-2 mb-3">{{ $item->deskripsi_kriteria }}</p>
-                                            
+                                            <div class="p-3 mb-3 bg-light rounded-lg text-muted small"
+                                                style="border-left: 4px solid #4a90e2; font-size: 0.82rem; line-height: 1.5;">
+                                                {{ $item->deskripsi_kriteria }}
+                                            </div>
+
                                             <div class="table-responsive">
                                                 <table class="table table-hover table-borderless align-middle mb-0">
                                                     <thead class="text-muted small uppercase tracking-wider">
                                                         <tr>
                                                             <th style="width: 150px;">Nilai Skala</th>
                                                             <th>Deskripsi Parameter / Skala</th>
-                                                            <th style="width: 100px;" class="text-center">Status</th>
-                                                            <th style="width: 100px;" class="text-center">Aksi</th>
+                                                            <th style="width: 120px;" class="text-center">Status</th>
+                                                            <th style="width: 120px;" class="text-center">Aksi</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         @foreach ($item->scales as $scale)
                                                             <tr class="border-top">
                                                                 <td>
-                                                                    <div class="badge badge-pill badge-light p-2 px-3 border">
+                                                                    <div class="scale-badge-pill">
                                                                         Skala {{ $scale->nilai_skala }}
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    <span class="text-sm {{ !$scale->is_aktif ? 'text-muted text-strikethrough' : '' }}">{{ $scale->deskripsi_skala }}</span>
+                                                                    <span
+                                                                        class="text-sm {{ !$scale->is_aktif ? 'text-muted text-strikethrough' : '' }}">{{ $scale->deskripsi_skala }}</span>
                                                                 </td>
                                                                 <td class="text-center">
                                                                     @if($scale->is_aktif)
-                                                                        <span class="badge badge-pill badge-success px-2 py-1">Aktif</span>
+                                                                        <span class="status-pill status-active">
+                                                                            <span class="status-dot"></span>Aktif
+                                                                        </span>
                                                                     @else
-                                                                        <span class="badge badge-pill badge-secondary px-2 py-1">Non-aktif</span>
+                                                                        <span class="status-pill status-inactive">
+                                                                            <span class="status-dot"></span>Non-aktif
+                                                                        </span>
                                                                     @endif
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <button type="button"
-                                                                            class="btn btn-sm btn-outline-secondary rounded-pill px-2"
-                                                                            data-toggle="modal"
-                                                                            data-target="#modalEditSkala-{{ $item->id_kriteria }}-{{ $scale->nilai_skala }}"
-                                                                            title="Edit Skala">
-                                                                        <i data-lucide="pencil" style="width: 13px; height: 13px;"></i>
-                                                                        <span class="d-none d-md-inline ml-1" style="font-size: 0.78rem;">Edit</span>
+                                                                        class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                                                                        data-toggle="modal"
+                                                                        data-target="#modalEditSkala-{{ $item->id_kriteria }}-{{ $scale->nilai_skala }}"
+                                                                        title="Edit Skala">
+                                                                        <i data-lucide="pencil"
+                                                                            style="width: 13px; height: 13px;"></i>
+                                                                        <span class="d-none d-md-inline ml-1"
+                                                                            style="font-size: 0.78rem;">Edit</span>
                                                                     </button>
                                                                 </td>
                                                             </tr>
@@ -124,17 +145,17 @@
 
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+    <script>
+        $(document).ready(function () {
+            AOS.init({
+                duration: 800,
+                once: true
+            });
 
-        // Re-initialize Lucide icons after modals are shown
-        $(document).on('shown.bs.modal', function() {
-            lucide.createIcons();
+            // Re-initialize Lucide icons after modals are shown
+            $(document).on('shown.bs.modal', function () {
+                lucide.createIcons();
+            });
         });
-    });
-</script>
+    </script>
 @endpush

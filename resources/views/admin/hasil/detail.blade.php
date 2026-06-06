@@ -146,10 +146,9 @@
                                                                                     <div class="eval-list">
                                                                                         @foreach($res->evaluations as $eval)
                                                                                             <div class="d-flex align-items-start mb-2 bg-white p-2 rounded border-left border-danger shadow-sm">
-                                                                                                <i data-lucide="x" class="text-danger mr-2 mt-1" style="width: 14px;"></i>
-                                                                                                <div class="small">
-                                                                                                    <div class="font-weight-bold text-dark">{{ $eval['kriteria'] }}</div>
-                                                                                                    <div class="text-muted">Belum memenuhi standar: "{{ $eval['target_desc'] }}".</div>
+                                                                                                <i data-lucide="alert-circle" class="text-danger mr-2 mt-0.5" style="width: 14px; height: 14px;"></i>
+                                                                                                <div class="small text-muted">
+                                                                                                    Lakukan perbaikan pada kriteria <strong class="text-dark">{{ $eval['kriteria'] }}</strong> dengan memastikan {{ lcfirst($eval['target_desc']) }}
                                                                                                 </div>
                                                                                             </div>
                                                                                         @endforeach
