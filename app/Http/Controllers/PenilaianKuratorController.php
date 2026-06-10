@@ -206,6 +206,29 @@ class PenilaianKuratorController extends Controller
     }
 
     /**
+     * Menyimpan komentar/catatan kurator untuk produk yang dinilai.
+     */
+    public function storeKomentar(Request $request, $id_periode, $id_alternatif)
+    {
+        $request->validate([
+            'catatan_kurator' => 'nullable|string',
+        ]);
+
+        $periodeAlternatif = PeriodeAlternatif::where('id_periode_kurasi', $id_periode)
+            ->where('id_alternatif', $id_alternatif)
+            ->firstOrFail();
+
+        $periodeAlternatif->update([
+            'catatan_kurator' => $request->catatan_kurator
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Komentar berhasil disimpan',
+        ]);
+    }
+
+    /**
      * Mengubah status periode kurasi menjadi selesai.
      */
     public function selesaikanKurasi($id_periode)

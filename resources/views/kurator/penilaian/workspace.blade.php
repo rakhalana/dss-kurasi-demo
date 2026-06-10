@@ -122,6 +122,20 @@
                                         </div>
                                     </div>
                                 @endforeach
+                                <!-- Step Catatan -->
+                                <div class="kriteria-card" data-step="{{ count($kriteriaList) + 1 }}" data-kriteria-id="komentar">
+                                    <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+                                        <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                                            <h4 class="font-weight-bold mb-2">Catatan / Komentar Kurator</h4>
+                                            <p class="text-muted">Berikan catatan atau komentar keseluruhan terhadap produk ini (Opsional).</p>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <textarea id="catatanKurator" class="form-control" rows="5" placeholder="Tulis catatan Anda di sini...">{{ $produkAktif->catatan_kurator ?? '' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
@@ -189,7 +203,7 @@
 <script>
     $(document).ready(function() {
         @if(!$semuaDinilai)
-        const totalSteps = {{ count($kriteriaList) }};
+        const totalSteps = {{ count($kriteriaList) + 1 }};
         let currentStep = 1;
         const idPeriode = Number("{{ $periode->id_periode_kurasi }}");
         const idAlternatif = Number("{{ $produkAktif->id_alternatif }}");
@@ -305,6 +319,13 @@
 
         function checkStepValidity() {
             const currentCard = $(`.kriteria-card[data-step="${currentStep}"]`);
+            
+            if (currentCard.data('kriteria-id') === 'komentar') {
+                $('#btnNext').prop('disabled', false);
+                $('#btnSimpan').prop('disabled', false);
+                return;
+            }
+
             const isChecked = currentCard.find('input[type="radio"]:checked').length > 0;
             
             if (isChecked) {
@@ -321,6 +342,30 @@
             return new Promise((resolve, reject) => {
                 const currentCard = $(`.kriteria-card[data-step="${currentStep}"]`);
                 const idKriteria = currentCard.data('kriteria-id');
+
+                if (idKriteria === 'komentar') {
+                    const catatan = $('#catatanKurator').val();
+                    const saveKomentarUrl = "{{ route('kurator.penilaian.komentar', ['id_periode' => $periode->id_periode_kurasi, 'id_alternatif' => $produkAktif->id_alternatif]) }}";
+                    
+                    $.ajax({
+                        url: saveKomentarUrl,
+                        type: 'POST',
+                        data: {
+                            catatan_kurator: catatan
+                        },
+                        success: function(response) {
+                            isSaving = false;
+                            resolve(response);
+                        },
+                        error: function(xhr) {
+                            console.error('Save error', xhr);
+                            isSaving = false;
+                            reject(xhr);
+                        }
+                    });
+                    return;
+                }
+
                 const nilaiInput = currentCard.find('input[type="radio"]:checked').val();
 
                 if (!nilaiInput) {

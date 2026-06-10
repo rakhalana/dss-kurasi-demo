@@ -16,6 +16,7 @@ class PeriodeAlternatif extends Model
         'id_alternatif',
         'status_lolos_legalitas',
         'urutan_input',
+        'catatan_kurator',
     ];
 
     protected $casts = [

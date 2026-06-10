@@ -63,6 +63,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/kurator/penilaian/{id_periode}', [\App\Http\Controllers\PenilaianKuratorController::class, 'detailPeriode'])->name('kurator.penilaian.detail');
     Route::get('/kurator/penilaian/{id_periode}/workspace/{id_alternatif?}', [\App\Http\Controllers\PenilaianKuratorController::class, 'workspace'])->name('kurator.penilaian.workspace');
     Route::post('/kurator/penilaian/{id_periode}/workspace/{id_alternatif}/kriteria/{id_kriteria}', [\App\Http\Controllers\PenilaianKuratorController::class, 'storePenilaian'])->name('kurator.penilaian.store');
+    Route::post('/kurator/penilaian/{id_periode}/workspace/{id_alternatif}/komentar', [\App\Http\Controllers\PenilaianKuratorController::class, 'storeKomentar'])->name('kurator.penilaian.komentar');
     Route::post('/kurator/penilaian/{id_periode}/selesaikan', [\App\Http\Controllers\PenilaianKuratorController::class, 'selesaikanKurasi'])->name('kurator.penilaian.selesaikan');
     Route::get('/kurator/penilaian/{id_periode}/selesai', [\App\Http\Controllers\PenilaianKuratorController::class, 'halamanSelesai'])->name('kurator.penilaian.selesai');
 

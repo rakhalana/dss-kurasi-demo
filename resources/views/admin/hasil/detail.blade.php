@@ -154,6 +154,14 @@
                                                                                         @endforeach
                                                                                     </div>
                                                                                 </div>
+                                                                                
+                                                                                @if(!empty($res->pa->catatan_kurator))
+                                                                                    <div class="mb-3 p-2 bg-white rounded border border-info shadow-sm">
+                                                                                        <div class="small font-weight-bold text-info mb-1"><i data-lucide="message-square" class="mr-1" style="width: 12px;"></i> Catatan Kurator:</div>
+                                                                                        <p class="small text-muted mb-0 font-italic">{{ $res->pa->catatan_kurator }}</p>
+                                                                                    </div>
+                                                                                @endif
+
                                                                                 @if($res->status_layak === 'layak_retail_bersyarat')
                                                                                     <div class="saran-box p-2 bg-white rounded border border-warning">
                                                                                         <div class="small font-weight-bold text-warning mb-1"><i data-lucide="lightbulb" class="mr-1" style="width: 12px;"></i> Rekomendasi:</div>
@@ -171,6 +179,13 @@
                                                                                     <p class="small text-dark font-weight-bold mb-1">Performa Sempurna!</p>
                                                                                     <p class="small text-muted mb-0">Produk ini telah memenuhi seluruh kriteria target nilai yang ditetapkan.</p>
                                                                                 </div>
+                                                                                
+                                                                                @if(!empty($res->pa->catatan_kurator))
+                                                                                    <div class="mt-3 p-2 bg-white rounded border border-info shadow-sm text-left">
+                                                                                        <div class="small font-weight-bold text-info mb-1"><i data-lucide="message-square" class="mr-1" style="width: 12px;"></i> Catatan Kurator:</div>
+                                                                                        <p class="small text-muted mb-0 font-italic">{{ $res->pa->catatan_kurator }}</p>
+                                                                                    </div>
+                                                                                @endif
                                                                             @endif
                                                                         </div>
                                                                     </div>

@@ -138,10 +138,9 @@
                                     @endforeach
                                 </div>
                                 <div class="mt-3">
-                                    <strong class="text-dark d-block mb-1" style="font-size: 0.82rem;">Rekomendasi Tindak
-                                        Lanjut:</strong>
+                                    <strong class="text-dark d-block mb-1" style="font-size: 0.82rem;">Catatan Evaluasi Kurator:</strong>
                                     <span class="text-muted d-block" style="font-size: 0.8rem; line-height: 1.4;">
-                                        Lakukan penyesuaian pada aspek di atas agar memenuhi standar retail sepenuhnya.
+                                        {{ $res->pa->catatan_kurator ?? 'Lakukan penyesuaian pada aspek di atas agar memenuhi standar retail sepenuhnya.' }}
                                     </span>
                                 </div>
                             </div>
@@ -226,11 +225,9 @@
                                     </div>
 
                                     <div class="mt-3">
-                                        <strong class="text-dark d-block mb-1" style="font-size: 0.82rem;">Rekomendasi Tindak
-                                            Lanjut:</strong>
+                                        <strong class="text-dark d-block mb-1" style="font-size: 0.82rem;">Catatan Evaluasi Kurator:</strong>
                                         <span class="text-muted d-block" style="font-size: 0.8rem; line-height: 1.4;">
-                                            Lakukan perbaikan menyeluruh pada aspek di atas agar siap diajukan kembali pada periode
-                                            kurasi berikutnya.
+                                            {{ $res->pa->catatan_kurator ?? 'Lakukan perbaikan menyeluruh pada aspek di atas agar siap diajukan kembali pada periode kurasi berikutnya.' }}
                                         </span>
                                     </div>
 
@@ -251,21 +248,28 @@
     </table>
 
     <div class="mt-4 p-3 border rounded bg-light" style="font-size: 0.85rem; page-break-inside: avoid;">
-        <h6 class="font-weight-bold mb-2">Keterangan Status Penilaian:</h6>
+        <h6 class="font-weight-bold mb-3">Keterangan Status & Tahapan Lanjutan UMKM:</h6>
         <div class="row">
             <div class="col-4">
                 <strong>1. Layak Retail:</strong><br>
-                Produk direkomendasikan sebagai siap masuk retail.
+                Produk direkomendasikan dan siap dipasarkan secara retail.
+                <div class="mt-2 text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+                    <i class="font-weight-bold">Tahapan lanjutan:</i> UMKM dapat segera berkoordinasi dengan pengelola/retailer untuk proses onboarding, penyediaan stok, dan penandatanganan PKS.
+                </div>
             </div>
             <div class="col-4 border-left border-right">
                 <strong>2. Layak Retail Bersyarat:</strong><br>
-                - UMKM melakukan perbaikan produk pada kriteria tertentu.<br>
-                - Kurator melakukan verifikasi perbaikan secara terbatas.
+                Produk berpotensi namun memerlukan sedikit penyesuaian.
+                <div class="mt-2 text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+                    <i class="font-weight-bold">Tahapan lanjutan:</i> UMKM wajib melakukan perbaikan sesuai catatan kurator. Setelah diperbaiki, laporkan kembali untuk diverifikasi ulang tanpa proses kurasi awal.
+                </div>
             </div>
             <div class="col-4">
                 <strong>3. Belum Layak:</strong><br>
-                - UMKM melakukan perbaikan menyeluruh.<br>
-                - Produk mengikuti kurasi ulang penuh.
+                Produk belum memenuhi standar dasar kelayakan retail.
+                <div class="mt-2 text-muted" style="font-size: 0.8rem; line-height: 1.4;">
+                    <i class="font-weight-bold">Tahapan lanjutan:</i> UMKM disarankan melakukan perbaikan menyeluruh secara mandiri atau mengikuti pendampingan, lalu dapat mendaftar pada periode kurasi selanjutnya.
+                </div>
             </div>
         </div>
     </div>
