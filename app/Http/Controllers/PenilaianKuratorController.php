@@ -125,6 +125,8 @@ class PenilaianKuratorController extends Controller
 
         // Menentukan produk aktif yang sedang atau akan dinilai oleh kurator
         $produkAktif = null;
+        $semuaDinilai = false;
+        
         if ($id_alternatif) {
             $produkAktif = $antreanProduk->firstWhere('id_alternatif', $id_alternatif);
             if (!$produkAktif) {
@@ -144,8 +146,6 @@ class PenilaianKuratorController extends Controller
                 ]);
             }
         }
-
-        $semuaDinilai = $semuaDinilai ?? ($antreanProduk->every(fn($item) => $item->is_dinilai));
 
         $kriteriaList = Kriteria::with(['scales' => function($q) {
             $q->where('is_aktif', true)->orderBy('nilai_skala', 'desc');
