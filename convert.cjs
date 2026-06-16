@@ -16,40 +16,33 @@ function sqlToPhp(filename, outname) {
         let currentTuple = [];
         let currentVal = '';
         let inString = false;
-        let inTuple = false;
         
         for (let i = 0; i < valuesRaw.length; i++) {
             const char = valuesRaw[i];
             
             if (char === "'" && (i === 0 || valuesRaw[i-1] !== '\\')) {
-                if (inTuple) {
-                    inString = !inString;
-                    currentVal += char;
-                }
+                inString = !inString;
+                currentVal += char;
             } else if (!inString && char === '(') {
-                inTuple = true;
                 currentTuple = [];
                 currentVal = '';
             } else if (!inString && char === ')') {
-                inTuple = false;
                 if (currentVal.trim() !== '') currentTuple.push(currentVal.trim());
                 tuples.push(currentTuple);
                 currentVal = '';
             } else if (!inString && char === ',') {
-                if (inTuple) {
-                    currentTuple.push(currentVal.trim());
-                    currentVal = '';
+                // To avoid pushing empty strings when there is a space after comma
+                if (currentVal.trim() !== '' || currentVal === '') {
+                   // wait, if currentVal is empty, and it's a comma, it might be an empty field, but sql doesn't do empty fields without NULL
+                   currentTuple.push(currentVal.trim());
                 }
+                currentVal = '';
             } else {
-                if (inTuple) {
-                    currentVal += char;
-                }
+                currentVal += char;
             }
         }
         
-        // Filter out any completely empty tuples or tuples that don't match column count
-        tuples = tuples.filter(t => t.length === cols.length);
-
+        // Chunk inserts to avoid memory/performance issues
         let chunks = [];
         for (let i=0; i<tuples.length; i+=100) {
             chunks.push(tuples.slice(i, i+100));
@@ -61,7 +54,6 @@ function sqlToPhp(filename, outname) {
                 phpCode += `            [\n`;
                 for (let i = 0; i < cols.length; i++) {
                     let val = t[i];
-                    if (val === undefined) val = 'null';
                     if (val === 'NOW()') val = 'now()';
                     else if (val === 'NULL') val = 'null';
                     phpCode += `                '${cols[i]}' => ${val},\n`;
@@ -74,6 +66,7 @@ function sqlToPhp(filename, outname) {
     
     phpCode += `    }\n\n    public function down()\n    {\n        // Hapus data jika migrasi dibatalkan\n`;
     
+    // Reverse table truncation
     let tables = [...sql.matchAll(/INSERT INTO `([^`]+)`/g)].map(m => m[1]);
     let uniqueTables = [...new Set(tables)].reverse();
     for(let table of uniqueTables) {

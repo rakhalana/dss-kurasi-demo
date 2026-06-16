@@ -174,10 +174,10 @@ class ProdukExcelService
                         $path = 'produk/' . $filename;
                         
                         if ($produk && $produk->foto_produk) {
-                            Storage::disk('public')->delete($produk->foto_produk);
+                            Storage::disk('supabase')->delete($produk->foto_produk);
                         }
                         
-                        Storage::disk('public')->put($path, $imageContents);
+                        Storage::disk('supabase')->put($path, $imageContents);
                         $updateData['foto_produk'] = $path;
                     }
                 }
