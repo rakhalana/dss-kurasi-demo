@@ -18,7 +18,7 @@
                         <div class="product-detail-img shadow-sm rounded-lg overflow-hidden mb-4 bg-white"
                             style="width: 220px; height: 220px; border: 5px solid #fff;">
                             @if($item->foto_produk)
-                                <img src="{{ asset('storage/' . $item->foto_produk) }}"
+                                <img src="{{ Storage::disk('supabase')->url($item->foto_produk) }}"
                                     class="w-100 h-100 object-fit-cover">
                             @else
                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">

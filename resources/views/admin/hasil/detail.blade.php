@@ -69,7 +69,7 @@
                                                         <div class="d-flex align-items-center">
                                                             <div class="product-img-wrapper mr-3 shadow-sm border">
                                                                 @if($res->alternatif->foto_produk)
-                                                                    <img src="{{ asset('storage/' . $res->alternatif->foto_produk) }}" alt="Foto">
+                                                                    <img src="{{ Storage::disk('supabase')->url($res->alternatif->foto_produk) }}" alt="Foto">
                                                                 @else
                                                                     <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light">
                                                                         <i data-lucide="image" class="text-muted" style="width: 16px;"></i>

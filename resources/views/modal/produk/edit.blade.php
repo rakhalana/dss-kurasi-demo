@@ -18,7 +18,7 @@
                                 <label class="text-muted small font-weight-bold uppercase tracking-wider d-block text-left">Foto Produk</label>
                                 <div class="product-preview mx-auto rounded shadow-sm overflow-hidden mb-3 bg-white" style="width: 150px; height: 150px; border: 3px solid #f8f9fa;">
                                     @if($item->foto_produk)
-                                        <img src="{{ asset('storage/' . $item->foto_produk) }}" id="preview-{{ $item->id_alternatif }}" class="w-100 h-100 object-fit-cover">
+                                        <img src="{{ Storage::disk('supabase')->url($item->foto_produk) }}" id="preview-{{ $item->id_alternatif }}" class="w-100 h-100 object-fit-cover">
                                     @else
                                         <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted" id="preview-placeholder-{{ $item->id_alternatif }}">
                                             <i data-lucide="image" style="width: 40px; height: 40px;"></i>

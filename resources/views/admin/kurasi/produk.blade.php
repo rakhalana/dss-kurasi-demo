@@ -107,7 +107,7 @@
                                                     <div class="d-flex align-items-center">
                                                         <div class="product-img-wrapper mr-3 shadow-sm">
                                                             @if($alt->foto_produk)
-                                                                <img src="{{ asset('storage/' . $alt->foto_produk) }}" alt="{{ $alt->nama_produk }}" class="w-100 h-100 object-fit-cover">
+                                                                <img src="{{ Storage::disk('supabase')->url($alt->foto_produk) }}" alt="{{ $alt->nama_produk }}" class="w-100 h-100 object-fit-cover">
                                                             @else
                                                                 <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
                                                                     <i data-lucide="package" style="width: 20px;"></i>

@@ -38,7 +38,7 @@ class ProdukController extends Controller
             if ($request->hasFile('foto_produk')) {
                 $file = $request->file('foto_produk');
                 $filename = time() . '_' . $file->getClientOriginalName();
-                $path = $file->storeAs('produk', $filename, 'public');
+                $path = $file->storeAs('produk', $filename, 'supabase');
                 $data['foto_produk'] = $path;
             }
 
@@ -75,12 +75,12 @@ class ProdukController extends Controller
 
         if ($request->hasFile('foto_produk')) {
             if ($produk->foto_produk) {
-                Storage::disk('public')->delete($produk->foto_produk);
+                Storage::disk('supabase')->delete($produk->foto_produk);
             }
 
             $file = $request->file('foto_produk');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $path = $file->storeAs('produk', $filename, 'public');
+            $path = $file->storeAs('produk', $filename, 'supabase');
             $data['foto_produk'] = $path;
         }
 
@@ -94,7 +94,7 @@ class ProdukController extends Controller
         $produk = Alternatif::findOrFail($id);
         
         if ($produk->foto_produk) {
-            Storage::disk('public')->delete($produk->foto_produk);
+            Storage::disk('supabase')->delete($produk->foto_produk);
         }
 
         $produk->delete();

@@ -154,7 +154,7 @@
                                                                 <div class="d-flex align-items-center">
                                                                     <div class="product-img-wrapper mr-3 shadow-sm border" style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
                                                                         @if($item->alternatif->foto_produk)
-                                                                            <img src="{{ asset('storage/' . $item->alternatif->foto_produk) }}" class="w-100 h-100" style="object-fit: cover;">
+                                                                            <img src="{{ Storage::disk('supabase')->url($item->alternatif->foto_produk) }}" class="w-100 h-100" style="object-fit: cover;">
                                                                         @else
                                                                             <div class="w-100 h-100 d-flex align-items-center justify-content-center bg-light text-muted"><i data-lucide="image" style="width: 16px;"></i></div>
                                                                         @endif
