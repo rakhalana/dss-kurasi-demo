@@ -1,4 +1,9 @@
 <?php
+// Force PHP to display all errors
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+
 // Set up temporary storage for Vercel Serverless environment
 $storagePath = '/tmp/storage';
 if (!is_dir($storagePath)) {
@@ -22,4 +27,10 @@ $_SERVER['VIEW_COMPILED_PATH'] = $storagePath . '/framework/views';
 putenv("VIEW_COMPILED_PATH={$storagePath}/framework/views");
 
 // Forward Vercel requests to normal index.php
-require __DIR__ . '/../public/index.php';
+try {
+    require __DIR__ . '/../public/index.php';
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo '<h1>Error</h1>';
+    echo '<pre>' . $e->getMessage() . "\n\n" . $e->getTraceAsString() . '</pre>';
+}
